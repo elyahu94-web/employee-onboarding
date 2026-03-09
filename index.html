@@ -800,6 +800,7 @@ function toggleDisabled(show){ document.getElementById('disabledDetails').style.
 
 // ילדים
 var childCount = 0;
+function removeChild(btn){ btn.closest('[id^="child_"]').remove(); }
 function addChild(){
   childCount++;
   var div = document.createElement('div');
@@ -815,7 +816,7 @@ function addChild(){
     +'<label style="display:flex;gap:4px;cursor:pointer"><input type="checkbox" id="cc1_'+childCount+'"> בחזקתי</label>'
     +'<label style="display:flex;gap:4px;cursor:pointer"><input type="checkbox" id="cc2_'+childCount+'"> קצבת ב"ל</label>'
     +'</div>'
-    +'<button onclick="document.getElementById('child_'+childCount+'').remove()" style="background:var(--red);color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.8rem;flex-shrink:0">✕</button>';
+    +'<button onclick="removeChild(this)" style="background:var(--red);color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:.8rem;flex-shrink:0">✕</button>';
   document.getElementById('childrenList').appendChild(div);
 }
 
