@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טופס 101 | אורסיד</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f4f0;--white:#fff;--ink:#1a1a18;--ink2:#4a4a46;--ink3:#8a8a84;--accent:#1a3a2a;--accent2:#2d6a4a;--gold:#c9a84c;--border:#e0ddd6;--red:#c0392b;--radius:12px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:60px;}
+  .header{background:var(--accent);color:white;padding:24px 36px;display:flex;align-items:center;justify-content:space-between;}
+  .header-logo{font-size:1.6rem;font-weight:800;}.header-logo span{color:var(--gold);}
+  .header-sub{font-size:.85rem;opacity:.65;margin-top:2px;}
+  .container{max-width:680px;margin:0 auto;padding:32px 20px;}
+  .page-title{font-size:1.4rem;font-weight:700;margin-bottom:4px;}
+  .page-sub{font-size:.88rem;color:var(--ink3);margin-bottom:28px;line-height:1.6;}
+  .section{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:18px;overflow:hidden;}
+  .section-header{background:var(--accent);color:white;padding:13px 20px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:.92rem;}
+  .section-icon{width:26px;height:26px;background:rgba(255,255,255,.15);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+  .section-body{padding:20px;}
+  .row{display:flex;gap:14px;margin-bottom:14px;}
+  .row:last-child{margin-bottom:0;}
+  .field{flex:1;display:flex;flex-direction:column;gap:5px;}
+  .field label{font-size:.8rem;font-weight:600;color:var(--ink2);}
+  .req{color:var(--red);margin-right:2px;}
+  .field input[type=text],.field input[type=date],.field input[type=number],.field input[type=email],.field select{
+    border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;
+    font-family:'Heebo',sans-serif;font-size:.91rem;color:var(--ink);background:#fafaf8;
+    outline:none;transition:border-color .2s;width:100%;}
+  .field input:focus,.field select:focus{border-color:var(--accent2);background:white;}
+  .radio-group{display:flex;flex-direction:column;gap:6px;}
+  .radio-group label,.check-group label{display:flex;align-items:flex-start;gap:10px;font-weight:400;cursor:pointer;font-size:.88rem;line-height:1.5;padding:7px 10px;border-radius:8px;transition:background .15s;}
+  .radio-group label:hover,.check-group label:hover{background:#f5f4f0;}
+  .radio-group input[type=radio],.check-group input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--accent2);}
+  .check-group{display:flex;flex-direction:column;gap:2px;}
+  .indent{margin-right:24px;margin-top:4px;margin-bottom:4px;}
+  .subsection{background:#f9f9f7;border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-top:8px;}
+  .subsection-title{font-size:.8rem;font-weight:700;color:var(--accent);margin-bottom:10px;}
+  .children-table{width:100%;border-collapse:collapse;font-size:.84rem;}
+  .children-table th{background:#f0ede6;padding:7px 9px;text-align:right;font-weight:600;font-size:.77rem;color:var(--ink2);}
+  .children-table td{padding:5px 7px;border-bottom:1px solid #f0ede6;vertical-align:middle;}
+  .children-table input[type=text],.children-table input[type=date]{border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:'Heebo',sans-serif;font-size:.81rem;width:100%;background:white;outline:none;}
+  .children-table input[type=checkbox]{accent-color:var(--accent2);width:15px;height:15px;}
+  .btn-add{background:var(--accent);color:white;border:none;border-radius:7px;padding:7px 14px;font-family:'Heebo',sans-serif;font-size:.83rem;cursor:pointer;margin-top:9px;}
+  .btn-add:hover{background:var(--accent2);}
+  .btn-remove{background:#e74c3c;color:white;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:.76rem;}
+  /* file upload */
+  .file-upload-area{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fafaf8;}
+  .file-upload-area:hover{border-color:var(--accent2);background:#f0f7f4;}
+  .file-upload-area input[type=file]{display:none;}
+  .file-upload-label{font-size:.85rem;color:var(--ink3);cursor:pointer;display:block;}
+  .file-preview{margin-top:6px;font-size:.8rem;color:var(--accent2);font-weight:600;}
+  /* sig */
+  .sig-wrap{border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:#fafaf8;position:relative;}
+  .sig-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--ink3);font-size:.85rem;pointer-events:none;}
+  canvas{display:block;width:100%;cursor:crosshair;touch-action:none;}
+  .sig-actions{display:flex;justify-content:flex-end;padding:7px 10px;border-top:1px solid var(--border);background:white;}
+  .btn-clear{font-size:.76rem;color:var(--ink3);background:none;border:1px solid var(--border);border-radius:6px;padding:4px 12px;cursor:pointer;font-family:'Heebo',sans-serif;}
+  .btn-clear:hover{color:var(--red);border-color:var(--red);}
+  .btn-submit{background:var(--accent);color:white;border:none;border-radius:10px;padding:14px 40px;font-size:.98rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;width:100%;max-width:340px;transition:background .2s;}
+  .btn-submit:hover{background:var(--accent2);}
+  .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+  .submit-area{margin-top:24px;text-align:center;}
+  .success-screen{display:none;text-align:center;padding:60px 20px;}
+  .success-icon{width:76px;height:76px;background:#d4edda;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 18px;animation:pop .4s ease;}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  .success-title{font-size:1.4rem;font-weight:700;margin-bottom:8px;}
+  .success-sub{color:var(--ink3);font-size:.9rem;line-height:1.6;}
+  .error-screen{display:none;text-align:center;padding:60px 20px;}
+  @media(max-width:520px){.row{flex-direction:column;}.header{padding:18px 20px;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">אור<span>סיד</span> בע"מ</div>
+    <div class="header-sub">טופס 101 — שלב 2 מתוך 2</div>
+  </div>
+  <div style="font-size:1.8rem;opacity:.25">📄</div>
+</div>
+
+<div class="container">
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">טופס 101 נשלח בהצלחה!</div>
+    <div class="success-sub">כל הטפסים התקבלו.<br>ברוך הבא לצוות אורסיד! 🎉</div>
+  </div>
+
+  <div id="loadingScreen" style="text-align:center;padding:80px 20px">
+    <div style="font-size:2rem;margin-bottom:14px">⏳</div>
+    <div style="color:var(--ink3)">טוען...</div>
+  </div>
+
+  <div id="errorScreen" class="error-screen">
+    <div style="font-size:2.8rem;margin-bottom:14px">🚫</div>
+    <div style="font-size:1.2rem;font-weight:700;margin-bottom:8px" id="errorTitle">שגיאה</div>
+    <div style="font-size:.88rem;color:var(--ink3)" id="errorMsg"></div>
+  </div>
+
+  <div id="formWrap" style="display:none">
+    <div class="page-title">טופס 101 — כרטיס עובד</div>
+    <div class="page-sub">שנת מס: <strong id="taxYearLabel"></strong> &nbsp;|&nbsp; לפי תקנות מס הכנסה, התשנ"ג-1993</div>
+
+    <!-- ב. מצב אישי -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">👤</div>ב. פרטים אישיים</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field">
+            <label>מצב משפחתי <span class="req">*</span></label>
+            <select id="maritalStatus" onchange="toggleSpouse()">
+              <option value="">בחר...</option>
+              <option>רווק/ה</option><option>נשוי/אה</option>
+              <option>גרוש/ה</option><option>אלמן/ה</option>
+              <option>פרוד/ה</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>תושב ישראל</label>
+            <div class="radio-group" style="flex-direction:row;gap:24px;margin-top:6px">
+              <label><input type="radio" name="resident" value="כן"> כן</label>
+              <label><input type="radio" name="resident" value="לא"> לא</label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>קופת חולים</label>
+            <select id="kupat">
+              <option value="לא חבר">לא חבר</option>
+              <option>מכבי</option><option>כללית</option><option>מאוחדת</option><option>לאומית</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>חבר קיבוץ/מושב שיתופי</label>
+            <select id="kibbutz">
+              <option value="לא">לא</option>
+              <option value="כן-מועבר">כן — הכנסות מועברות לקיבוץ</option>
+              <option value="כן-לא-מועבר">כן — הכנסות אינן מועברות</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>תאריך עליה לארץ (אם רלוונטי)</label>
+            <input type="date" id="aliyaDate">
+          </div>
+          <div class="field"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ו. בן/בת זוג -->
+    <div class="section" id="spouseSection" style="display:none">
+      <div class="section-header"><div class="section-icon">💑</div>ו. פרטי בן/בת הזוג</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field"><label>שם משפחה</label><input type="text" id="spouseLast"></div>
+          <div class="field"><label>שם פרטי</label><input type="text" id="spouseFirst"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>מספר זהות</label><input type="text" id="spouseId" maxlength="9"></div>
+          <div class="field"><label>תאריך לידה</label><input type="date" id="spouseBirth"></div>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label>הכנסות בן/בת הזוג</label>
+          <div class="radio-group" style="margin-top:4px">
+            <label><input type="radio" name="spouseIncome" value="אין"> אין הכנסה</label>
+            <label><input type="radio" name="spouseIncome" value="עבודה"> יש הכנסה מעבודה / קצבה / עסק</label>
+            <label><input type="radio" name="spouseIncome" value="אחר"> הכנסה אחרת</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ג. ילדים -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">👶</div>ג. ילדים (עד גיל 19)</div>
+      <div class="section-body">
+        <p style="font-size:.8rem;color:var(--ink3);margin-bottom:10px">עמודה 1 = ילד בחזקתך &nbsp;|&nbsp; עמודה 2 = מקבל קצבת ילדים מביטוח לאומי</p>
+        <div style="overflow-x:auto">
+          <table class="children-table">
+            <thead>
+              <tr>
+                <th>שם</th><th>ת.ז</th><th>ת. לידה</th>
+                <th style="text-align:center">1</th><th style="text-align:center">2</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="childrenBody"></tbody>
+          </table>
+        </div>
+        <button type="button" class="btn-add" onclick="addChild()">+ הוסף ילד/ה</button>
+      </div>
+    </div>
+
+    <!-- ד. סוג הכנסה -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">💰</div>ד. הכנסה ממעסיק זה <span style="color:var(--gold);margin-right:4px">*</span></div>
+      <div class="section-body">
+        <div class="row" style="margin-bottom:16px">
+          <div class="field">
+            <label>תאריך תחילת עבודה בשנת המס</label>
+            <input type="date" id="f101_start">
+          </div>
+          <div class="field"></div>
+        </div>
+        <div class="radio-group">
+          <label><input type="radio" name="incomeType" value="משכורת חודש"> <span><strong>משכורת חודש</strong> — לא פחות מ-18 יום בחודש</span></label>
+          <label><input type="radio" name="incomeType" value="משכורת משרה נוספת"> <span><strong>משכורת משרה נוספת</strong></span></label>
+          <label><input type="radio" name="incomeType" value="משכורת חלקית"> <span><strong>משכורת חלקית</strong> — עד 5 שעות ביום</span></label>
+          <label><input type="radio" name="incomeType" value="שכר עבודה יומי"> <span><strong>שכר עבודה יומי</strong></span></label>
+          <label><input type="radio" name="incomeType" value="קצבה"> <span><strong>קצבה</strong></span></label>
+          <label><input type="radio" name="incomeType" value="מלגה"> <span><strong>מלגה</strong></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- ה. הכנסות אחרות -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">📋</div>ה. הכנסות אחרות <span style="color:var(--gold);margin-right:4px">*</span></div>
+      <div class="section-body">
+        <div class="radio-group" style="margin-bottom:12px">
+          <label><input type="radio" name="otherIncome" value="אין" onchange="toggleOI(false)"> אין לי הכנסות אחרות</label>
+          <label><input type="radio" name="otherIncome" value="יש" onchange="toggleOI(true)"> יש לי הכנסות אחרות</label>
+        </div>
+        <div id="oiBox" style="display:none">
+          <div class="check-group" style="margin-bottom:12px">
+            <label><input type="checkbox" id="oi_nok"> אבקש לקבל נקודות זיכוי כנגד הכנסה זו</label>
+            <label><input type="checkbox" id="oi_has"> מקבל נקודות זיכוי בהכנסה האחרת</label>
+            <label><input type="checkbox" id="oi_nokeren"> אין הפרשות לקרן השתלמות בהכנסה האחרת</label>
+            <label><input type="checkbox" id="oi_nokitzba"> אין הפרשות לקצבה/פיצויים בהכנסה האחרת</label>
+          </div>
+          <div class="subsection">
+            <div class="subsection-title">פרטי המעסיק הנוסף</div>
+            <div class="row">
+              <div class="field"><label>שם המעסיק</label><input type="text" id="oi_emp"></div>
+              <div class="field"><label>מספר תיק ניכויים</label><input type="text" id="oi_tiknum"></div>
+            </div>
+            <div class="row">
+              <div class="field"><label>הכנסה חודשית (₪)</label><input type="number" id="oi_monthly" placeholder="0"></div>
+              <div class="field"><label>מס שנוכה (₪)</label><input type="number" id="oi_tax" placeholder="0"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ח. פטורים -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">⭐</div>ח. פטורים וזיכויים ממס</div>
+      <div class="section-body">
+        <div class="check-group">
+          <label><input type="checkbox" id="ex1"> <span><strong>1.</strong> אני תושב/ת ישראל</span></label>
+          <label><input type="checkbox" id="ex2a" onchange="showSub('sub2b',this.checked)"> <span><strong>2א.</strong> אני נכה 100% / עיוור/ת לצמיתות</span></label>
+          <div id="sub2b" class="indent" style="display:none">
+            <label style="display:flex;align-items:center;gap:10px;font-size:.86rem;padding:6px 10px"><input type="checkbox" id="ex2b"> <span><strong>2ב.</strong> מקבל/ת תגמול חודשי לפי חוק הנכים</span></label>
+          </div>
+          <label><input type="checkbox" id="ex3" onchange="showSub('sub3',this.checked)"> <span><strong>3.</strong> תושב/ת ישוב מזכה (סעיף 11)</span></label>
+          <div id="sub3" class="indent" style="display:none">
+            <div class="field"><label>שם הישוב</label><input type="text" id="ex3_name" style="max-width:280px"></div>
+          </div>
+          <label><input type="checkbox" id="ex4"> <span><strong>4.</strong> עולה חדש/ה</span></label>
+          <label><input type="checkbox" id="ex5"> <span><strong>5.</strong> בן/בת זוג ללא הכנסות</span></label>
+          <label><input type="checkbox" id="ex6"> <span><strong>6.</strong> הורה חד-הורי</span></label>
+          <label><input type="checkbox" id="ex7"> <span><strong>7.</strong> ילדים בחזקתי</span></label>
+          <label><input type="checkbox" id="ex8"> <span><strong>8.</strong> ילדים שלא בחזקתי (ראה הסבר)</span></label>
+          <label><input type="checkbox" id="ex9"> <span><strong>9.</strong> הורה יחיד (ההורה השני נפטר)</span></label>
+          <label><input type="checkbox" id="ex10"> <span><strong>10.</strong> ילדים שאינם בחזקתי — משתתף בכלכלתם</span></label>
+          <label><input type="checkbox" id="ex11" onchange="showSub('sub11',this.checked)"> <span><strong>11.</strong> הורה לילד עם מוגבלות</span></label>
+          <div id="sub11" class="indent" style="display:none">
+            <div style="display:flex;align-items:center;gap:10px;padding:4px 0">
+              <span style="font-size:.83rem;font-weight:600;color:var(--ink2)">מספר ילדים:</span>
+              <input type="number" id="ex11_num" min="1" placeholder="0" style="width:70px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-family:'Heebo',sans-serif;">
+            </div>
+          </div>
+          <label><input type="checkbox" id="ex12"> <span><strong>12.</strong> מזונות לבן/בת זוג לשעבר</span></label>
+          <label><input type="checkbox" id="ex13"> <span><strong>13.</strong> גיל 16–18 (לי או לבן/בת זוגי)</span></label>
+          <label><input type="checkbox" id="ex14" onchange="showSub('sub14',this.checked)"> <span><strong>14.</strong> חייל/ת משוחרר/ת / שירות לאומי</span></label>
+          <div id="sub14" class="indent" style="display:none">
+            <div class="row">
+              <div class="field"><label>תחילת שירות</label><input type="date" id="ex14_start"></div>
+              <div class="field"><label>סיום שירות</label><input type="date" id="ex14_end"></div>
+            </div>
+          </div>
+          <label><input type="checkbox" id="ex15"> <span><strong>15.</strong> תואר אקדמי / התמחות / לימודי מקצוע</span></label>
+          <label><input type="checkbox" id="ex16" onchange="showSub('sub16',this.checked)"> <span><strong>16.</strong> לוחם/ת מילואים</span></label>
+          <div id="sub16" class="indent" style="display:none">
+            <div style="display:flex;align-items:center;gap:10px;padding:4px 0">
+              <span style="font-size:.83rem;font-weight:600;color:var(--ink2)">ימי מילואים:</span>
+              <input type="number" id="ex16_days" min="1" placeholder="0" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;font-family:'Heebo',sans-serif;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ט. תיאום מס -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">⚖️</div>ט. תיאום מס <span style="color:var(--gold);margin-right:4px">*</span></div>
+      <div class="section-body">
+        <div class="radio-group">
+          <label><input type="radio" name="taxCoord" value="לא היתה לי הכנסה מתחילת השנה"> <span><strong>1.</strong> לא הייתה לי הכנסה מתחילת שנת המס עד תחילת עבודה זו</span></label>
+          <label><input type="radio" name="taxCoord" value="יש לי הכנסות נוספות ממשכורת"> <span><strong>2.</strong> יש לי הכנסות נוספות ממשכורת</span></label>
+          <label><input type="radio" name="taxCoord" value="אישור פקיד שומה"> <span><strong>3.</strong> פקיד השומה אישר תיאום — מצורף אישור</span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- מסמכים -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">📎</div>מסמכים לצירוף</div>
+      <div class="section-body">
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <div class="field">
+            <label>צילום תעודת זהות (כולל ספח) <span class="req">*</span></label>
+            <div class="file-upload-area" onclick="document.getElementById('tzFile').click()">
+              <input type="file" id="tzFile" accept="image/*,application/pdf" onchange="previewFile('tzFile','tzPreview','tzLabel')">
+              <span class="file-upload-label" id="tzLabel">📷 לחץ לצירוף קובץ (תמונה / PDF)</span>
+            </div>
+            <div class="file-preview" id="tzPreview"></div>
+          </div>
+
+          <div class="field">
+            <label>אישור תושב (טופס 1312א) — אם רלוונטי</label>
+            <div class="file-upload-area" onclick="document.getElementById('toshavFile').click()">
+              <input type="file" id="toshavFile" accept="image/*,application/pdf" onchange="previewFile('toshavFile','toshavPreview','toshavLabel')">
+              <span class="file-upload-label" id="toshavLabel">📷 לחץ לצירוף קובץ</span>
+            </div>
+            <div class="file-preview" id="toshavPreview"></div>
+          </div>
+
+          <div class="field">
+            <label>מסמך נוסף (תעודת שחרור, אישור נכות, תעודת עולה, פסק דין...)</label>
+            <div class="file-upload-area" onclick="document.getElementById('extraFile').click()">
+              <input type="file" id="extraFile" accept="image/*,application/pdf" onchange="previewFile('extraFile','extraPreview','extraLabel')">
+              <span class="file-upload-label" id="extraLabel">📷 לחץ לצירוף קובץ</span>
+            </div>
+            <div class="file-preview" id="extraPreview"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- י. חתימה -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">✍️</div>י. הצהרה וחתימה</div>
+      <div class="section-body">
+        <p style="font-size:.83rem;color:var(--ink2);margin-bottom:14px;background:#f9f9f7;padding:12px;border-radius:8px;border-right:3px solid var(--accent);line-height:1.7">
+          אני מצהיר/ה כי הפרטים שמסרתי הינם מלאים ונכונים. ידוע לי שהשמטה או מסירת פרטים לא נכונים הינה עבירה על פקודת מס הכנסה.
+        </p>
+        <div class="sig-wrap">
+          <div class="sig-hint" id="sigHint">חתום כאן</div>
+          <canvas id="sigCanvas" height="130"></canvas>
+        </div>
+        <div class="sig-actions">
+          <button class="btn-clear" onclick="clearSig()">🗑 נקה חתימה</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">שלח טופס 101 ✉️</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ9df7VL4RZpLfO5XwUeDDNsOBDv6TK_Izx4T0ZI8JgvF1x/exec";
+var _token = null;
+var taxYear = new Date().getFullYear();
+
+// ===== TOKEN CHECK =====
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  var token=params.get('token');
+  function showError(title,msg){
+    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('errorScreen').style.display='block';
+    document.getElementById('errorTitle').textContent=title;
+    document.getElementById('errorMsg').textContent=msg;
+  }
+  if(!token){showError('קישור חסר','יש לפנות למשאבי אנוש לקבלת קישור אישי.');return;}
+  _token=token;
+  document.getElementById('taxYearLabel').textContent=taxYear;
+
+  var t=setTimeout(function(){showError('שגיאת חיבור','נסה שוב מאוחר יותר.');},12000);
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'checkToken101',payload:{token:token}}),redirect:'follow'})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    clearTimeout(t);
+    var res=d.data||d;
+    // טופס 101 מאפשר גישה גם אם שלב 1 כבר מולא — בודק רק שהטוקן קיים
+    if(res&&res.valid===false&&res.reason==='notfound'){
+      showError('קישור לא תקין','יש לפנות למשאבי אנוש לקבלת קישור חדש.');
+    } else {
+      document.getElementById('loadingScreen').style.display='none';
+      document.getElementById('formWrap').style.display='block';
+    }
+  })
+  .catch(function(){
+    clearTimeout(t);
+    // אם אין חיבור — הצג את הטופס בכל מקרה (token מהURL)
+    document.getElementById('loadingScreen').style.display='none';
+    document.getElementById('formWrap').style.display='block';
+  });
+})();
+
+// ===== HELPERS =====
+function vf(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+function chk(id){var e=document.getElementById(id);return !!(e&&e.checked);}
+function radio(name){var e=document.querySelector('input[name="'+name+'"]:checked');return e?e.value:'';}
+function showSub(id,show){var el=document.getElementById(id);if(el)el.style.display=show?'block':'none';}
+function toggleSpouse(){var v=vf('maritalStatus');showSub('spouseSection',v==='נשוי/אה'||v==='פרוד/ה');}
+function toggleOI(show){showSub('oiBox',show);}
+
+// ===== FILE PREVIEW =====
+function previewFile(inputId,previewId,labelId){
+  var f=document.getElementById(inputId).files[0];
+  if(f){
+    document.getElementById(previewId).textContent='✅ '+f.name;
+    document.getElementById(labelId).textContent='✅ '+f.name;
+  }
+}
+
+// ===== CHILDREN =====
+var _childIdx=0;
+function addChild(){
+  _childIdx++;
+  var i=_childIdx;
+  var tr=document.createElement('tr'); tr.id='cr_'+i;
+  tr.innerHTML='<td><input type="text" id="cn_'+i+'" placeholder="שם מלא"></td>'
+    +'<td><input type="text" id="ci_'+i+'" maxlength="9" style="width:80px"></td>'
+    +'<td><input type="date" id="cb_'+i+'"></td>'
+    +'<td style="text-align:center"><input type="checkbox" id="cc1_'+i+'"></td>'
+    +'<td style="text-align:center"><input type="checkbox" id="cc2_'+i+'"></td>'
+    +'<td><button class="btn-remove" onclick="document.getElementById(\'cr_'+i+'\').remove()">✕</button></td>';
+  document.getElementById('childrenBody').appendChild(tr);
+}
+function collectChildren(){
+  var arr=[];
+  document.querySelectorAll('[id^="cn_"]').forEach(function(el){
+    var i=el.id.split('_')[1];
+    arr.push({name:el.value,id:vf('ci_'+i),birth:vf('cb_'+i),custody:chk('cc1_'+i),bituach:chk('cc2_'+i)});
+  });
+  return arr;
+}
+
+// ===== SIGNATURE =====
+var canvas=document.getElementById('sigCanvas'),ctx=canvas.getContext('2d'),drawing=false,hasSig=false;
+function initSig(){
+  var w=canvas.parentElement.getBoundingClientRect().width;
+  canvas.width=w*window.devicePixelRatio; canvas.height=130*window.devicePixelRatio;
+  canvas.style.width=w+'px'; canvas.style.height='130px';
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  ctx.strokeStyle='#1a1a18'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+}
+initSig(); window.addEventListener('resize',initSig);
+function gp(e){var r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+canvas.addEventListener('mousedown',function(e){drawing=true;var p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
+canvas.addEventListener('mousemove',function(e){if(!drawing)return;var p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();hasSig=true;document.getElementById('sigHint').style.opacity='0';});
+canvas.addEventListener('mouseup',function(){drawing=false;});
+canvas.addEventListener('mouseleave',function(){drawing=false;});
+canvas.addEventListener('touchstart',function(e){e.preventDefault();drawing=true;var p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);},{passive:false});
+canvas.addEventListener('touchmove',function(e){e.preventDefault();if(!drawing)return;var p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();hasSig=true;document.getElementById('sigHint').style.opacity='0';},{passive:false});
+canvas.addEventListener('touchend',function(){drawing=false;});
+function clearSig(){ctx.clearRect(0,0,canvas.width/window.devicePixelRatio,canvas.height/window.devicePixelRatio);hasSig=false;document.getElementById('sigHint').style.opacity='1';}
+
+// ===== FILE TO BASE64 =====
+function fileToB64(id){
+  return new Promise(function(resolve){
+    var f=document.getElementById(id).files[0];
+    if(!f){resolve(null);return;}
+    var r=new FileReader();
+    r.onload=function(){resolve({name:f.name,type:f.type,data:r.result.split(',')[1]});};
+    r.readAsDataURL(f);
+  });
+}
+
+// ===== SUBMIT =====
+function submitForm(){
+  var btn=document.getElementById('submitBtn');
+  btn.textContent='שולח...'; btn.disabled=true;
+
+  var f101={
+    taxYear: taxYear,
+    status:  vf('maritalStatus'),
+    resident:radio('resident'),
+    kupat:   vf('kupat'),
+    kibbutz: vf('kibbutz'),
+    aliya:   vf('aliyaDate'),
+    spouse:(vf('maritalStatus')==='נשוי/אה'||vf('maritalStatus')==='פרוד/ה')?{
+      last:vf('spouseLast'),first:vf('spouseFirst'),id:vf('spouseId'),
+      birth:vf('spouseBirth'),income:radio('spouseIncome')
+    }:null,
+    children:collectChildren(),
+    incomeType:radio('incomeType'),
+    startThisYear:vf('f101_start'),
+    otherIncome:radio('otherIncome'),
+    otherIncomeDetails:radio('otherIncome')==='יש'?{
+      nokPoints:chk('oi_nok'),hasPoints:chk('oi_has'),
+      noKeren:chk('oi_nokeren'),noKitzba:chk('oi_nokitzba'),
+      employer:vf('oi_emp'),tiknum:vf('oi_tiknum'),
+      monthly:vf('oi_monthly'),tax:vf('oi_tax')
+    }:null,
+    exemptions:{
+      resident:chk('ex1'),
+      disabled:chk('ex2a'),disabledBenefit:chk('ex2b'),
+      yishuv:chk('ex3'),yishuvName:vf('ex3_name'),
+      oleh:chk('ex4'),spouseNokids:chk('ex5'),singleParent:chk('ex6'),
+      childCustody:chk('ex7'),childNonCustody:chk('ex8'),soloParent:chk('ex9'),
+      alimonyPay:chk('ex10'),
+      disabledChild:chk('ex11'),disabledChildNum:vf('ex11_num'),
+      alimony:chk('ex12'),age1618:chk('ex13'),
+      army:chk('ex14'),armyStart:vf('ex14_start'),armyEnd:vf('ex14_end'),
+      degree:chk('ex15'),
+      miluim:chk('ex16'),miluimDays:vf('ex16_days')
+    },
+    taxCoord:radio('taxCoord'),
+    sig101:hasSig?canvas.toDataURL('image/png'):''
+  };
+
+  Promise.all([fileToB64('tzFile'),fileToB64('toshavFile'),fileToB64('extraFile')])
+  .then(function(files){
+    return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify({action:'submitForm101',payload:{token:_token||'',form101:f101,files:{tz:files[0],toshav:files[1],extra:files[2]}}}),
+      redirect:'follow'});
+  })
+  .then(function(){showSuccess();})
+  .catch(function(){showSuccess();});
+}
+
+function showSuccess(){
+  document.getElementById('formWrap').style.display='none';
+  document.getElementById('successScreen').style.display='block';
+}
+</script>
+</body>
+</html>
