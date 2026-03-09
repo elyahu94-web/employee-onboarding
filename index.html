@@ -659,45 +659,54 @@ var _token = null;
     document.getElementById('errorMsg').textContent = 'לא ניתן לגשת לטופס ישירות. יש לפנות למשאבי אנוש לקבלת קישור אישי.';
     return;
   }
-  // פתח טופס ישירות — בדיקת שימוש כפול תיעשה בעת השליחה
-  document.getElementById('loadingScreen').style.display = 'none';
-  _token = token;
-  document.getElementById('formWrap').style.display = 'block';
+  // בדוק token עם השרת לפני שמציג את הטופס
+  function showError(title, msg) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('errorScreen').style.display = 'block';
+    document.getElementById('errorTitle').textContent = title;
+    document.getElementById('errorMsg').textContent = msg;
+  }
+  function showForm(name) {
+    _token = token;
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('formWrap').style.display = 'block';
+    if (name) document.getElementById('fullName').value = name;
+  }
 
-  // בדוק ברקע אם כבר מולא
+  // timeout — אם תוך 10 שניות אין תשובה, חסום (לא תן גישה)
+  var checkTimeout = setTimeout(function(){
+    showError('שגיאת חיבור', 'לא ניתן לאמת את הקישור. נסה שוב מאוחר יותר.');
+  }, 10000);
+
   fetch(FORM_SCRIPT_URL, {
-    method:'POST',
-    headers:{'Content-Type':'text/plain'},
-    body: JSON.stringify({action:'checkToken', payload:{token:token}}),
-    redirect:'follow'
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify({action: 'checkToken', payload: {token: token}}),
+    redirect: 'follow'
   })
   .then(function(r){ return r.json(); })
   .then(function(d){
+    clearTimeout(checkTimeout);
     var res = d.data || d;
-    if(res && res.valid === false && res.reason === 'used'){
-      document.getElementById('formWrap').style.display = 'none';
-      document.getElementById('errorScreen').style.display = 'block';
-      document.getElementById('errorTitle').textContent = 'הטופס כבר מולא ✅';
-      document.getElementById('errorMsg').textContent = 'הפרטים שלך כבר התקבלו. אין צורך למלא שוב.';
-    } else if(res && res.name){
-      document.getElementById('fullName').value = res.name;
+    if (res && res.valid === false) {
+      if (res.reason === 'used') {
+        showError('הטופס כבר מולא ✅', 'הפרטים שלך כבר התקבלו. אין צורך למלא שוב.');
+      } else {
+        showError('קישור לא תקין', 'הקישור אינו תקף. יש לפנות למשאבי אנוש.');
+      }
+    } else if (res && res.valid === true) {
+      showForm(res.name || '');
+    } else {
+      // תשובה לא צפויה — חסום
+      showError('שגיאה', 'לא ניתן לאמת את הקישור. פנה למשאבי אנוש.');
     }
   })
   .catch(function(){
-    // CORS error = Apps Script קיבל — תן גישה לטופס
-    document.getElementById('loadingScreen').style.display = 'none';
-    _token = token;
-    document.getElementById('formWrap').style.display = 'block';
+    clearTimeout(checkTimeout);
+    // שגיאת רשת — חסום גישה
+    showError('שגיאת חיבור', 'לא ניתן לאמת את הקישור. נסה שוב מאוחר יותר.');
   });
-
-  // timeout — אם תוך 6 שניות אין תשובה, תן גישה
-  setTimeout(function(){
-    if(document.getElementById('loadingScreen').style.display !== 'none'){
-      document.getElementById('loadingScreen').style.display = 'none';
-      _token = token;
-      document.getElementById('formWrap').style.display = 'block';
-    }
-  }, 6000);
 })();
 
 // ===== חתימה =====
