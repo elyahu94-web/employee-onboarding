@@ -229,9 +229,9 @@
 </div>
 
 <script>
-var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ9df7VL4RZpLfO5XwUeDDNsOBDv6TK_Izx4T0ZI8JgvF1x/exec";
+var SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 var FORM_BASE_URL = "https://elyahu94-web.github.io/employee-onboarding/?token=";
-var ADMIN_PASSWORD = "Eli7539541"; // שנה לסיסמה שתרצה
+var ADMIN_PASSWORD = "orsid2026"; // שנה לסיסמה שתרצה
 
 function login(){
   var pw = document.getElementById('pwInput').value;
@@ -259,9 +259,9 @@ function generateLink(){
     document.getElementById('workerName').value = '';
     btn.textContent = 'צור קישור'; btn.disabled = false;
     loadLinks();
-  }, function(){
+  }, function(e){
     btn.textContent = 'צור קישור'; btn.disabled = false;
-    alert('שגיאה — נסה שוב');
+    alert('שגיאה: ' + (e&&e.message ? e.message : 'בדוק שה-URL נכון'));
   });
 }
 
@@ -309,8 +309,19 @@ function apiCall(action, payload, onSuccess, onError){
     body: JSON.stringify({action: action, payload: payload}),
     redirect: 'follow'
   })
-  .then(function(r){ return r.json(); })
-  .then(function(d){ onSuccess(d.data !== undefined ? d.data : d); })
+  .then(function(r){
+    // Apps Script מחזיר text/plain לפעמים
+    return r.text();
+  })
+  .then(function(text){
+    try {
+      var d = JSON.parse(text);
+      onSuccess(d.data !== undefined ? d.data : d);
+    } catch(e){
+      // אם לא JSON — כנראה CORS redirect, נסה שוב עם no-cors
+      if(onError) onError(new Error('parse error: ' + text.substring(0,100)));
+    }
+  })
   .catch(function(e){ if(onError) onError(e); });
 }
 </script>
