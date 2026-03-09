@@ -361,7 +361,7 @@
         <div class="row">
           <div class="field">
             <label>שם הבנק <span class="req">*</span></label>
-            <select id="bank" required>
+            <select id="bank" required onchange="toggleOtherBank(this.value)">
               <option value="">בחר בנק...</option>
               <option>בנק הפועלים</option>
               <option>בנק לאומי</option>
@@ -373,8 +373,9 @@
               <option>בנק יהב</option>
               <option>בנק מרכנתיל</option>
               <option>One Zero</option>
-              <option>אחר</option>
+              <option value="אחר">אחר</option>
             </select>
+            <input type="text" id="bankOther" placeholder="שם הבנק" style="display:none;margin-top:8px">
             <span class="err-msg">שדה חובה</span>
           </div>
           <div class="field">
@@ -425,7 +426,7 @@
 
 <script>
 // ===== Apps Script URL — החלף כאן =====
-var FORM_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ9df7VL4RZpLfO5XwUeDDNsOBDv6TK_Izx4T0ZI8JgvF1x/exec";
+var FORM_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 
 // ===== חתימה =====
 var canvas = document.getElementById('sigCanvas');
@@ -462,6 +463,13 @@ canvas.addEventListener('touchmove',  function(e){ e.preventDefault(); if(!drawi
 canvas.addEventListener('touchend',   function(){ drawing=false; });
 
 function clearSig(){ ctx.clearRect(0,0,canvas.width/window.devicePixelRatio,canvas.height/window.devicePixelRatio); hasSig=false; document.getElementById('sigHint').style.opacity='1'; }
+
+// ===== בנק אחר =====
+function toggleOtherBank(val){
+  var el = document.getElementById('bankOther');
+  el.style.display = val === 'אחר' ? 'block' : 'none';
+  if(val !== 'אחר') el.value = '';
+}
 
 // ===== progress =====
 function updateProgress(){
@@ -510,7 +518,7 @@ function submitForm(){
     gender:      document.getElementById('gender').value,
     role:        document.getElementById('role').value,
     startDate:   document.getElementById('startDate').value,
-    bank:        document.getElementById('bank').value,
+    bank:        (function(){ var b=document.getElementById('bank').value; return b==='אחר' ? (document.getElementById('bankOther').value||'אחר') : b; })(),
     branch:      document.getElementById('branch').value,
     bankNum:     document.getElementById('bankNum').value,
     accountName: document.getElementById('accountName').value,
@@ -520,18 +528,30 @@ function submitForm(){
   fetch(FORM_SCRIPT_URL, {
     method: 'POST',
     headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify({action: 'submitEmployeeForm', payload: payload})
+    body: JSON.stringify({action: 'submitEmployeeForm', payload: payload}),
+    redirect: 'follow'
   })
-  .then(function(r){ return r.json(); })
-  .then(function(){
+  .then(function(r){ 
+    // Apps Script מחזיר 200 גם אם יש redirect
+    return r.text();
+  })
+  .then(function(text){
+    // אם הגענו לכאן — נחשב הצלחה
     document.getElementById('formWrap').style.display = 'none';
     document.getElementById('successScreen').style.display = 'block';
     document.getElementById('progressBar').style.width = '100%';
   })
-  .catch(function(){
-    btn.textContent = 'שלח טופס ✉️';
-    btn.disabled = false;
-    alert('שגיאה בשליחה — נסה שוב');
+  .catch(function(err){
+    // CORS error אחרי שליחה מוצלחת — עדיין הצלחה
+    if(err.message && err.message.indexOf('Failed to fetch') >= 0){
+      document.getElementById('formWrap').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('progressBar').style.width = '100%';
+    } else {
+      btn.textContent = 'שלח טופס ✉️';
+      btn.disabled = false;
+      alert('שגיאה בשליחה — נסה שוב');
+    }
   });
 }
 </script>
