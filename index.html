@@ -271,7 +271,18 @@
     <div class="success-sub">הפרטים שלך התקבלו ויועברו לצוות משאבי אנוש אורסיד.<br>תודה!</div>
   </div>
 
-  <div id="formWrap">
+  <div id="loadingScreen" style="text-align:center;padding:80px 20px">
+    <div style="font-size:2rem;margin-bottom:16px">⏳</div>
+    <div style="font-size:1rem;color:var(--ink3)">טוען טופס...</div>
+  </div>
+
+  <div id="errorScreen" style="display:none;text-align:center;padding:60px 20px">
+    <div style="font-size:3rem;margin-bottom:16px">🚫</div>
+    <div style="font-size:1.3rem;font-weight:700;margin-bottom:10px" id="errorTitle">קישור לא תקין</div>
+    <div style="font-size:.9rem;color:var(--ink3)" id="errorMsg">הקישור שבו השתמשת אינו תקין או כבר שומש.</div>
+  </div>
+
+  <div id="formWrap" style="display:none">
     <div class="form-title">טופס פרטי עובד</div>
     <div class="form-subtitle">אנא מלא את כל הפרטים בצורה מדויקת. שדות המסומנים ב-<span style="color:var(--red)">*</span> הם חובה.</div>
 
@@ -422,11 +433,59 @@
     </div>
 
   </div><!-- /formWrap -->
+
 </div>
 
 <script>
 // ===== Apps Script URL — החלף כאן =====
 var FORM_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+var _token = null;
+
+// בדוק token מה-URL
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('token');
+  if(!token){
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('errorScreen').style.display = 'block';
+    document.getElementById('errorTitle').textContent = 'קישור חסר';
+    document.getElementById('errorMsg').textContent = 'לא ניתן לגשת לטופס ישירות. יש לפנות למשאבי אנוש לקבלת קישור אישי.';
+    return;
+  }
+  // בדוק תקינות token
+  fetch(FORM_SCRIPT_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body: JSON.stringify({action:'checkToken', payload:{token:token}}),
+    redirect:'follow'
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var res = d.data || d;
+    document.getElementById('loadingScreen').style.display = 'none';
+    if(res.valid){
+      _token = token;
+      // מלא שם עובד אוטומטית אם יש
+      if(res.name) document.getElementById('fullName').value = res.name;
+      document.getElementById('formWrap').style.display = 'block';
+    } else {
+      document.getElementById('errorScreen').style.display = 'block';
+      if(res.reason === 'used'){
+        document.getElementById('errorTitle').textContent = 'הטופס כבר מולא ✅';
+        document.getElementById('errorMsg').textContent = 'הפרטים שלך כבר התקבלו. אין צורך למלא שוב.';
+      } else {
+        document.getElementById('errorTitle').textContent = 'קישור לא תקין';
+        document.getElementById('errorMsg').textContent = 'הקישור פג תוקף או אינו תקין. פנה למשאבי אנוש.';
+      }
+    }
+  })
+  .catch(function(){
+    // אם יש CORS error — הנח שהכל בסדר ותן גישה
+    document.getElementById('loadingScreen').style.display = 'none';
+    _token = token;
+    document.getElementById('formWrap').style.display = 'block';
+  });
+})();
 
 // ===== חתימה =====
 var canvas = document.getElementById('sigCanvas');
@@ -522,7 +581,8 @@ function submitForm(){
     branch:      document.getElementById('branch').value,
     bankNum:     document.getElementById('bankNum').value,
     accountName: document.getElementById('accountName').value,
-    signature:   sigData
+    signature:   sigData,
+    token:       _token || ''
   };
 
   fetch(FORM_SCRIPT_URL, {
