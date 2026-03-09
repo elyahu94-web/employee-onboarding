@@ -7,322 +7,173 @@
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f5f4f0;
-    --white: #fff;
-    --ink: #1a1a18;
-    --ink2: #4a4a46;
-    --ink3: #8a8a84;
-    --accent: #1a3a2a;
-    --accent2: #2d6a4a;
-    --gold: #c9a84c;
-    --border: #e0ddd6;
-    --green: #27ae60;
-    --red: #c0392b;
+    --bg:#f5f4f0;--white:#fff;--ink:#1a1a18;--ink2:#4a4a46;--ink3:#8a8a84;
+    --accent:#1a3a2a;--accent2:#2d6a4a;--gold:#c9a84c;--border:#e0ddd6;--red:#c0392b;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Heebo', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
-
-  .header {
-    background: var(--accent);
-    color: white;
-    padding: 22px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .logo { font-size: 1.4rem; font-weight: 800; }
-  .logo span { color: var(--gold); }
-
-  .container { max-width: 560px; margin: 40px auto; padding: 0 20px; }
-
-  .card {
-    background: var(--white);
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    padding: 28px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.05);
-  }
-  .card-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 18px;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  label { display: block; font-size: .83rem; font-weight: 600; color: var(--ink2); margin-bottom: 6px; }
-  input[type=text], input[type=password] {
-    width: 100%;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    padding: 11px 14px;
-    font-family: 'Heebo', sans-serif;
-    font-size: .93rem;
-    outline: none;
-    transition: border-color .2s;
-    background: #fafaf8;
-  }
-  input:focus { border-color: var(--accent2); background: white; }
-
-  .btn {
-    width: 100%;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 9px;
-    padding: 13px;
-    font-size: .95rem;
-    font-weight: 700;
-    font-family: 'Heebo', sans-serif;
-    cursor: pointer;
-    margin-top: 14px;
-    transition: background .2s;
-  }
-  .btn:hover { background: var(--accent2); }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
-
-  /* תוצאה */
-  .result-box {
-    display: none;
-    background: #edf7f1;
-    border: 1.5px solid #a8d5b8;
-    border-radius: 10px;
-    padding: 18px;
-    margin-top: 16px;
-  }
-  .result-name { font-weight: 700; font-size: 1rem; margin-bottom: 10px; color: var(--accent); }
-  .link-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 10px;
-  }
-  .link-text {
-    flex: 1;
-    font-size: .78rem;
-    color: var(--ink2);
-    word-break: break-all;
-    direction: ltr;
-    text-align: left;
-  }
-  .btn-copy {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: .78rem;
-    font-family: 'Heebo', sans-serif;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background .2s;
-  }
-  .btn-copy:hover { background: var(--accent2); }
-  .btn-whatsapp {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    background: #25d366;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: .9rem;
-    font-weight: 600;
-    font-family: 'Heebo', sans-serif;
-    cursor: pointer;
-    text-decoration: none;
-  }
-
-  /* רשימת קישורים */
-  .links-list { margin-top: 8px; }
-  .link-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    margin-bottom: 8px;
-    background: white;
-    gap: 10px;
-  }
-  .link-item-name { font-weight: 600; font-size: .9rem; flex: 1; }
-  .badge {
-    font-size: .72rem;
-    padding: 3px 9px;
-    border-radius: 20px;
-    font-weight: 600;
-  }
-  .badge-pending { background: #fff3cd; color: #856404; }
-  .badge-done { background: #d4edda; color: #155724; }
-  .empty-list { color: var(--ink3); font-size: .88rem; text-align: center; padding: 16px 0; }
-
-  /* login */
-  #loginWrap { max-width: 360px; margin: 80px auto; padding: 0 20px; }
-  .login-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
-  .login-sub { font-size: .85rem; color: var(--ink3); margin-bottom: 22px; }
-  .err { color: var(--red); font-size: .82rem; margin-top: 8px; display: none; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;}
+  .header{background:var(--accent);color:white;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-size:1.4rem;font-weight:800;}.logo span{color:var(--gold);}
+  .container{max-width:560px;margin:40px auto;padding:0 20px 60px;}
+  .card{background:var(--white);border-radius:14px;border:1px solid var(--border);padding:24px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.05);}
+  .card-title{font-size:1.05rem;font-weight:700;margin-bottom:18px;color:var(--accent);display:flex;align-items:center;gap:8px;}
+  label{display:block;font-size:.83rem;font-weight:600;color:var(--ink2);margin-bottom:6px;}
+  input[type=text],input[type=password]{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'Heebo',sans-serif;font-size:.93rem;outline:none;transition:border-color .2s;background:#fafaf8;}
+  input:focus{border-color:var(--accent2);background:white;}
+  .btn{width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:13px;font-size:.95rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:14px;transition:background .2s;}
+  .btn:hover{background:var(--accent2);}
+  .btn.gray{background:#888;margin-top:10px;}.btn.gray:hover{background:#666;}
+  .result-box{display:none;background:#edf7f1;border:1.5px solid #a8d5b8;border-radius:10px;padding:16px;margin-top:16px;}
+  .result-name{font-weight:700;font-size:.95rem;margin-bottom:10px;color:var(--accent);}
+  .link-row{display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+  .link-text{flex:1;font-size:.73rem;color:var(--ink2);word-break:break-all;direction:ltr;text-align:left;}
+  .btn-copy{background:var(--accent);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:.78rem;font-family:'Heebo',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+  .btn-copy:hover{background:var(--accent2);}
+  .btn-wa{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#25d366;color:white;border:none;border-radius:8px;padding:10px;font-size:.9rem;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;text-decoration:none;}
+  .link-item{padding:12px 14px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:white;}
+  .link-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .link-item-name{font-weight:700;font-size:.92rem;}
+  .link-item-date{font-size:.73rem;color:var(--ink3);margin-bottom:6px;}
+  .badge{font-size:.72rem;padding:3px 9px;border-radius:20px;font-weight:600;}
+  .badge-pending{background:#fff3cd;color:#856404;}.badge-done{background:#d4edda;color:#155724;}
+  .lnk{font-size:.71rem;color:var(--ink3);direction:ltr;text-align:left;word-break:break-all;}
+  .empty-list{color:var(--ink3);font-size:.88rem;text-align:center;padding:16px 0;}
+  #loginWrap{max-width:360px;margin:80px auto;padding:0 20px;}
+  .err{color:var(--red);font-size:.82rem;margin-top:8px;display:none;}
 </style>
 </head>
 <body>
-
 <div class="header">
   <div class="logo">אור<span>סיד</span> בע"מ</div>
   <div style="font-size:.85rem;opacity:.6">ניהול טפסי עובדים</div>
 </div>
 
-<!-- Login -->
 <div id="loginWrap">
   <div class="card">
-    <div class="login-title">🔐 כניסה</div>
-    <div class="login-sub">הזן סיסמה לגישה לממשק</div>
+    <div class="card-title">🔐 כניסה</div>
     <label>סיסמה</label>
-    <input type="password" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+    <input type="password" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
     <button class="btn" onclick="login()">כניסה</button>
     <div class="err" id="pwErr">סיסמה שגויה</div>
   </div>
 </div>
 
-<!-- Main -->
 <div id="mainWrap" style="display:none">
 <div class="container">
-
-  <!-- יצירת קישור -->
   <div class="card">
-    <div class="card-title">🔗 יצירת קישור חד-פעמי לעובד</div>
+    <div class="card-title">🔗 יצירת קישור חד-פעמי</div>
     <label>שם העובד</label>
-    <input type="text" id="workerName" placeholder="למשל: חוסני מחמד" onkeydown="if(event.key==='Enter') generateLink()">
-    <button class="btn" id="genBtn" onclick="generateLink()">צור קישור</button>
-
+    <input type="text" id="workerName" placeholder="למשל: חוסני מחמד" onkeydown="if(event.key==='Enter')generateLink()">
+    <button class="btn" onclick="generateLink()">צור קישור</button>
     <div class="result-box" id="resultBox">
       <div class="result-name" id="resultName"></div>
       <div class="link-row">
         <span class="link-text" id="resultLink"></span>
-        <button class="btn-copy" onclick="copyLink()">העתק</button>
+        <button class="btn-copy" id="copyBtn" onclick="copyLink()">העתק</button>
       </div>
-      <a class="btn-whatsapp" id="waBtn" href="#" target="_blank">
-        📲 שלח ב-WhatsApp
-      </a>
+      <a class="btn-wa" id="waBtn" href="#" target="_blank">📲 שלח ב-WhatsApp</a>
     </div>
   </div>
-
-  <!-- רשימת קישורים -->
   <div class="card">
     <div class="card-title">📋 קישורים שנשלחו</div>
-    <div class="links-list" id="linksList">
-      <div class="empty-list">טוען...</div>
-    </div>
-    <button class="btn" style="margin-top:12px;background:var(--ink3)" onclick="loadLinks()">🔄 רענן רשימה</button>
+    <div id="linksList"><div class="empty-list">אין קישורים עדיין</div></div>
+    <button class="btn gray" onclick="clearDone()">🗑 מחק מולאו</button>
+    <button class="btn gray" onclick="clearAll()">🗑 נקה הכל</button>
   </div>
-
 </div>
 </div>
 
 <script>
-var SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
-var FORM_BASE_URL = "https://elyahu94-web.github.io/employee-onboarding/?token=";
-var ADMIN_PASSWORD = "orsid2026"; // שנה לסיסמה שתרצה
+var SCRIPT_URL  = "YOUR_APPS_SCRIPT_URL_HERE";
+var FORM_BASE   = "https://elyahu94-web.github.io/employee-onboarding/";
+var ADMIN_PASS  = "orsid2026";
+var SK          = "orsid_links_v2";
 
 function login(){
-  var pw = document.getElementById('pwInput').value;
-  if(pw === ADMIN_PASSWORD){
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('mainWrap').style.display = 'block';
-    loadLinks();
+  if(document.getElementById('pwInput').value===ADMIN_PASS){
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('mainWrap').style.display='block';
+    renderList();
   } else {
-    document.getElementById('pwErr').style.display = 'block';
+    document.getElementById('pwErr').style.display='block';
   }
 }
 
-function generateLink(){
-  var name = document.getElementById('workerName').value.trim();
-  if(!name){ alert('הזן שם עובד'); return; }
-  var btn = document.getElementById('genBtn');
-  btn.textContent = 'יוצר...'; btn.disabled = true;
+function makeToken(){
+  var c='abcdefghijklmnopqrstuvwxyz0123456789',t='';
+  for(var i=0;i<24;i++) t+=c[Math.floor(Math.random()*c.length)];
+  return t;
+}
 
-  apiCall('generateFormToken', {workerName: name}, function(token){
-    var link = FORM_BASE_URL + token;
-    document.getElementById('resultName').textContent = '✅ קישור נוצר עבור: ' + name;
-    document.getElementById('resultLink').textContent = link;
-    document.getElementById('resultBox').style.display = 'block';
-    document.getElementById('waBtn').href = 'https://wa.me/?text=' + encodeURIComponent('שלום ' + name + ',\nאנא מלא את טופס פרטי העובד:\n' + link);
-    document.getElementById('workerName').value = '';
-    btn.textContent = 'צור קישור'; btn.disabled = false;
-    loadLinks();
-  }, function(e){
-    btn.textContent = 'צור קישור'; btn.disabled = false;
-    alert('שגיאה: ' + (e&&e.message ? e.message : 'בדוק שה-URL נכון'));
-  });
+function generateLink(){
+  var name=document.getElementById('workerName').value.trim();
+  if(!name){alert('הזן שם עובד');return;}
+  var token=makeToken();
+  var link=FORM_BASE+'?token='+token;
+  var now=new Date();
+  var date=now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear()+
+    ' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+
+  // שמור ב-localStorage
+  var list=getList();
+  list.unshift({token:token,name:name,date:date,used:false});
+  saveList(list);
+  renderList();
+
+  // שלח לשרת ברקע
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'generateFormToken',payload:{workerName:name,token:token}}),
+    redirect:'follow'}).catch(function(){});
+
+  // הצג תוצאה
+  document.getElementById('resultName').textContent='✅ קישור נוצר עבור: '+name;
+  document.getElementById('resultLink').textContent=link;
+  document.getElementById('resultBox').style.display='block';
+  document.getElementById('waBtn').href='https://wa.me/?text='+
+    encodeURIComponent('שלום '+name+',\nאנא מלא את טופס פרטי העובד:\n'+link);
+  document.getElementById('workerName').value='';
 }
 
 function copyLink(){
-  var link = document.getElementById('resultLink').textContent;
+  var link=document.getElementById('resultLink').textContent;
   navigator.clipboard.writeText(link).then(function(){
-    var btn = document.querySelector('.btn-copy');
-    btn.textContent = '✅ הועתק';
-    setTimeout(function(){ btn.textContent = 'העתק'; }, 2000);
-  });
-}
-
-function loadLinks(){
-  document.getElementById('linksList').innerHTML = '<div class="empty-list">טוען...</div>';
-  apiCall('getFormTokens', {dummy:1}, function(tokens){
-    var el = document.getElementById('linksList');
-    if(!tokens || !tokens.length){ el.innerHTML = '<div class="empty-list">אין קישורים עדיין</div>'; return; }
-    el.innerHTML = '';
-    tokens.forEach(function(t){
-      var div = document.createElement('div');
-      div.className = 'link-item';
-      var badge = t.used
-        ? '<span class="badge badge-done">✅ מולא</span>'
-        : '<span class="badge badge-pending">⏳ ממתין</span>';
-      div.innerHTML = '<span class="link-item-name">'+t.name+'</span>'
-        + badge
-        + (t.used ? '' : '<button class="btn-copy" onclick="copyTokenLink(\''+t.token+'\')">העתק</button>');
-      el.appendChild(div);
-    });
-  }, function(){
-    document.getElementById('linksList').innerHTML = '<div class="empty-list">שגיאה בטעינה</div>';
+    var b=document.getElementById('copyBtn');
+    b.textContent='✅ הועתק';
+    setTimeout(function(){b.textContent='העתק';},2000);
   });
 }
 
 function copyTokenLink(token){
-  navigator.clipboard.writeText(FORM_BASE_URL + token).then(function(){
-    alert('הקישור הועתק ✅');
-  });
+  navigator.clipboard.writeText(FORM_BASE+'?token='+token)
+    .then(function(){alert('הועתק ✅');});
 }
 
-function apiCall(action, payload, onSuccess, onError){
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify({action: action, payload: payload}),
-    redirect: 'follow'
-  })
-  .then(function(r){
-    // Apps Script מחזיר text/plain לפעמים
-    return r.text();
-  })
-  .then(function(text){
-    try {
-      var d = JSON.parse(text);
-      onSuccess(d.data !== undefined ? d.data : d);
-    } catch(e){
-      // אם לא JSON — כנראה CORS redirect, נסה שוב עם no-cors
-      if(onError) onError(new Error('parse error: ' + text.substring(0,100)));
-    }
-  })
-  .catch(function(e){ if(onError) onError(e); });
+function getList(){ try{return JSON.parse(localStorage.getItem(SK))||[];}catch(e){return[];} }
+function saveList(l){ localStorage.setItem(SK,JSON.stringify(l)); }
+function clearDone(){ if(!confirm('למחוק קישורים שמולאו?')) return; saveList(getList().filter(function(i){return !i.used;})); renderList(); }
+function clearAll(){ if(!confirm('למחוק את כל הרשימה?')) return; localStorage.removeItem(SK); renderList(); }
+
+function renderList(){
+  var list=getList(),el=document.getElementById('linksList');
+  if(!list.length){el.innerHTML='<div class="empty-list">אין קישורים עדיין</div>';return;}
+  el.innerHTML='';
+  list.forEach(function(item){
+    var link=FORM_BASE+'?token='+item.token;
+    var badge=item.used
+      ?'<span class="badge badge-done">✅ מולא</span>'
+      :'<span class="badge badge-pending">⏳ ממתין</span>';
+    var d=document.createElement('div');
+    d.className='link-item';
+    d.innerHTML='<div class="link-item-top"><span class="link-item-name">'+item.name+'</span>'+badge+'</div>'
+      +'<div class="link-item-date">'+item.date+'</div>'
+      +(!item.used
+        ?'<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
+          +'<span class="lnk" style="flex:1">'+link+'</span>'
+          +'<button class="btn-copy" onclick="copyTokenLink(\''+item.token+'\')">העתק</button>'
+          +'</div>'
+        :'');
+    el.appendChild(d);
+  });
 }
 </script>
 </body>
