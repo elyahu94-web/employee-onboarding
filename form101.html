@@ -496,6 +496,22 @@ function submitForm(){
   var btn=document.getElementById('submitBtn');
   btn.textContent='שולח...'; btn.disabled=true;
 
+  var lastName  = vf('lastName');
+  var firstName = vf('firstName');
+  var idNum     = vf('idNum');
+  var phone     = vf('phone');
+  var email     = vf('email');
+  var street    = vf('street');
+  var city      = vf('city');
+  var birthDate = vf('birthDate');
+  var gender    = radio('gender');
+
+  if(!lastName||!firstName||!idNum||!phone||!street||!city||!birthDate){
+    alert('נא למלא את כל שדות החובה (פרטים אישיים)');
+    btn.textContent='שלח טופס 101 ✉️'; btn.disabled=false;
+    return;
+  }
+
   var f101={
     taxYear: taxYear,
     status:  vf('maritalStatus'),
@@ -537,7 +553,15 @@ function submitForm(){
   Promise.all([fileToB64('tzFile'),fileToB64('toshavFile'),fileToB64('extraFile')])
   .then(function(files){
     return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'submitForm101',payload:{token:_token||'',form101:f101,files:{tz:files[0],toshav:files[1],extra:files[2]}}}),
+      body:JSON.stringify({action:'submitForm101',payload:{
+        token:_token||'',
+        idNum:idNum, phone:phone, email:email,
+        address:street+', '+city,
+        birthDate:birthDate, gender:gender,
+        lastName:lastName, firstName:firstName,
+        form101:f101,
+        files:{tz:files[0],toshav:files[1],extra:files[2]}
+      }}),
       redirect:'follow'});
   })
   .then(function(){showSuccess();})
