@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טופס פרטי עובד | אורסיד</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --white: #ffffff;
+    --ink: #1a1a18;
+    --ink2: #4a4a46;
+    --ink3: #8a8a84;
+    --accent: #1a3a2a;
+    --accent2: #2d6a4a;
+    --gold: #c9a84c;
+    --border: #e0ddd6;
+    --red: #c0392b;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0 0 60px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--accent);
+    color: white;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 200px; height: 200px;
+    background: var(--gold);
+    opacity: .07;
+    border-radius: 50%;
+  }
+  .header-logo {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: white;
+  }
+  .header-logo span { color: var(--gold); }
+  .header-sub {
+    font-size: .85rem;
+    opacity: .7;
+    font-weight: 300;
+    letter-spacing: .5px;
+  }
+
+  /* Progress */
+  .progress-bar {
+    background: var(--accent2);
+    height: 4px;
+    width: 0%;
+    transition: width .4s ease;
+  }
+
+  /* Main */
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 32px 20px;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .form-subtitle {
+    font-size: .9rem;
+    color: var(--ink3);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  /* Sections */
+  .section {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: box-shadow .2s;
+  }
+  .section:hover { box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+  .section-header {
+    background: var(--accent);
+    color: white;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: .95rem;
+  }
+  .section-header .icon {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,.15);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .section-body { padding: 22px; }
+
+  /* Fields */
+  .row { display: flex; gap: 16px; margin-bottom: 16px; }
+  .row:last-child { margin-bottom: 0; }
+  .field { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--ink2);
+    letter-spacing: .3px;
+  }
+  .field label .req { color: var(--red); margin-right: 2px; }
+  .field input, .field select {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'Heebo', sans-serif;
+    font-size: .92rem;
+    color: var(--ink);
+    background: #fafaf8;
+    transition: border-color .2s, background .2s;
+    outline: none;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus {
+    border-color: var(--accent2);
+    background: white;
+  }
+  .field input.error { border-color: var(--red); }
+  .field .err-msg {
+    font-size: .75rem;
+    color: var(--red);
+    display: none;
+  }
+  .field input.error + .err-msg { display: block; }
+
+  /* Signature */
+  .sig-wrap {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fafaf8;
+    position: relative;
+  }
+  .sig-hint {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    color: var(--ink3);
+    font-size: .85rem;
+    pointer-events: none;
+    transition: opacity .2s;
+    text-align: center;
+    user-select: none;
+  }
+  canvas#sigCanvas {
+    display: block;
+    width: 100%;
+    height: 160px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .sig-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 10px;
+    border-top: 1px solid var(--border);
+    background: white;
+  }
+  .btn-clear {
+    font-size: .78rem;
+    color: var(--ink3);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-family: 'Heebo', sans-serif;
+    transition: all .2s;
+  }
+  .btn-clear:hover { color: var(--red); border-color: var(--red); }
+
+  /* Submit */
+  .submit-area { margin-top: 28px; text-align: center; }
+  .btn-submit {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    width: 100%;
+    max-width: 360px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit:hover { background: var(--accent2); }
+  .btn-submit:active { transform: scale(.98); }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+  /* Success */
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: #d4edda;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.2rem;
+    margin: 0 auto 20px;
+    animation: pop .4s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; }
+  .success-sub { color: var(--ink3); font-size: .95rem; }
+
+  @media(max-width:520px){
+    .row { flex-direction: column; gap: 12px; }
+    .header { padding: 20px; }
+    .header-logo { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">אור<span>סיד</span> בע"מ</div>
+    <div class="header-sub">טופס קליטת עובד חדש</div>
+  </div>
+  <div style="font-size:2rem;opacity:.3">📋</div>
+</div>
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="container">
+
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">הטופס נשלח בהצלחה!</div>
+    <div class="success-sub">הפרטים שלך התקבלו ויועברו לצוות משאבי אנוש אורסיד.<br>תודה!</div>
+  </div>
+
+  <div id="formWrap">
+    <div class="form-title">טופס פרטי עובד</div>
+    <div class="form-subtitle">אנא מלא את כל הפרטים בצורה מדויקת. שדות המסומנים ב-<span style="color:var(--red)">*</span> הם חובה.</div>
+
+    <!-- פרטים אישיים -->
+    <div class="section">
+      <div class="section-header">
+        <div class="icon">👤</div>
+        פרטים אישיים
+      </div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field">
+            <label>שם מלא <span class="req">*</span></label>
+            <input type="text" id="fullName" placeholder="שם פרטי ומשפחה" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+          <div class="field">
+            <label>מספר תעודת זהות <span class="req">*</span></label>
+            <input type="text" id="idNum" placeholder="9 ספרות" maxlength="9" required>
+            <span class="err-msg">נא להזין ת.ז תקינה</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>טלפון נייד <span class="req">*</span></label>
+            <input type="tel" id="phone" placeholder="05X-XXXXXXX" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+          <div class="field">
+            <label>אימייל</label>
+            <input type="email" id="email" placeholder="example@gmail.com">
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>כתובת מגורים <span class="req">*</span></label>
+            <input type="text" id="address" placeholder="רחוב, מספר, עיר" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>תאריך לידה</label>
+            <input type="date" id="birthDate">
+          </div>
+          <div class="field">
+            <label>מין</label>
+            <select id="gender">
+              <option value="">בחר...</option>
+              <option value="זכר">זכר</option>
+              <option value="נקבה">נקבה</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- פרטי תעסוקה -->
+    <div class="section">
+      <div class="section-header">
+        <div class="icon">💼</div>
+        פרטי תעסוקה
+      </div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field">
+            <label>תפקיד <span class="req">*</span></label>
+            <input type="text" id="role" placeholder="למשל: פועל בניין, נהג..." required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+          <div class="field">
+            <label>תאריך תחילת עבודה <span class="req">*</span></label>
+            <input type="date" id="startDate" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- פרטי בנק -->
+    <div class="section">
+      <div class="section-header">
+        <div class="icon">🏦</div>
+        פרטי חשבון בנק
+      </div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field">
+            <label>שם הבנק <span class="req">*</span></label>
+            <select id="bank" required>
+              <option value="">בחר בנק...</option>
+              <option>בנק הפועלים</option>
+              <option>בנק לאומי</option>
+              <option>בנק דיסקונט</option>
+              <option>בנק מזרחי טפחות</option>
+              <option>בנק הבינלאומי</option>
+              <option>בנק ירושלים</option>
+              <option>בנק אוצר החייל</option>
+              <option>בנק יהב</option>
+              <option>בנק מרכנתיל</option>
+              <option>One Zero</option>
+              <option>אחר</option>
+            </select>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+          <div class="field">
+            <label>מספר סניף <span class="req">*</span></label>
+            <input type="text" id="branch" placeholder="למשל: 622" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>מספר חשבון <span class="req">*</span></label>
+            <input type="text" id="bankNum" placeholder="מספר חשבון" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+          <div class="field">
+            <label>שם בעל החשבון <span class="req">*</span></label>
+            <input type="text" id="accountName" placeholder="כפי שמופיע בבנק" required>
+            <span class="err-msg">שדה חובה</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- חתימה -->
+    <div class="section">
+      <div class="section-header">
+        <div class="icon">✍️</div>
+        חתימה דיגיטלית
+      </div>
+      <div class="section-body">
+        <p style="font-size:.85rem;color:var(--ink3);margin-bottom:12px">חתום בתיבה למטה באצבע או בעכבר. בחתימתך אתה מאשר שהפרטים שמילאת נכונים.</p>
+        <div class="sig-wrap">
+          <div class="sig-hint" id="sigHint">חתום כאן</div>
+          <canvas id="sigCanvas" width="640" height="160"></canvas>
+        </div>
+        <div class="sig-actions">
+          <button class="btn-clear" onclick="clearSig()">🗑 נקה חתימה</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <button class="btn-submit" id="submitBtn" onclick="submitForm()">שלח טופס ✉️</button>
+    </div>
+
+  </div><!-- /formWrap -->
+</div>
+
+<script>
+// ===== Apps Script URL — החלף כאן =====
+var FORM_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+
+// ===== חתימה =====
+var canvas = document.getElementById('sigCanvas');
+var ctx = canvas.getContext('2d');
+var drawing = false;
+var hasSig = false;
+
+function resizeCanvas(){
+  var rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width * window.devicePixelRatio;
+  canvas.height = 160 * window.devicePixelRatio;
+  canvas.style.width = rect.width + 'px';
+  canvas.style.height = '160px';
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.strokeStyle = '#1a1a18';
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function getPos(e){
+  var r = canvas.getBoundingClientRect();
+  var src = e.touches ? e.touches[0] : e;
+  return { x: src.clientX - r.left, y: src.clientY - r.top };
+}
+canvas.addEventListener('mousedown',  function(e){ drawing=true; var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+canvas.addEventListener('mousemove',  function(e){ if(!drawing) return; var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); hasSig=true; document.getElementById('sigHint').style.opacity='0'; });
+canvas.addEventListener('mouseup',    function(){ drawing=false; });
+canvas.addEventListener('mouseleave', function(){ drawing=false; });
+canvas.addEventListener('touchstart', function(e){ e.preventDefault(); drawing=true; var p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+canvas.addEventListener('touchmove',  function(e){ e.preventDefault(); if(!drawing) return; var p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); hasSig=true; document.getElementById('sigHint').style.opacity='0'; });
+canvas.addEventListener('touchend',   function(){ drawing=false; });
+
+function clearSig(){ ctx.clearRect(0,0,canvas.width/window.devicePixelRatio,canvas.height/window.devicePixelRatio); hasSig=false; document.getElementById('sigHint').style.opacity='1'; }
+
+// ===== progress =====
+function updateProgress(){
+  var fields = ['fullName','idNum','phone','address','role','startDate','bank','branch','bankNum','accountName'];
+  var filled = fields.filter(function(id){ return document.getElementById(id).value.trim(); }).length;
+  document.getElementById('progressBar').style.width = ((filled/fields.length)*100) + '%';
+}
+document.querySelectorAll('input,select').forEach(function(el){ el.addEventListener('input', updateProgress); });
+
+// ===== validation =====
+function validateField(id, check){
+  var el = document.getElementById(id);
+  var valid = check ? check(el.value) : el.value.trim() !== '';
+  el.classList.toggle('error', !valid);
+  return valid;
+}
+
+function submitForm(){
+  var ok = true;
+  ok = validateField('fullName') && ok;
+  ok = validateField('idNum', function(v){ return /^\d{8,9}$/.test(v.trim()); }) && ok;
+  ok = validateField('phone') && ok;
+  ok = validateField('address') && ok;
+  ok = validateField('role') && ok;
+  ok = validateField('startDate') && ok;
+  ok = validateField('bank') && ok;
+  ok = validateField('branch') && ok;
+  ok = validateField('bankNum') && ok;
+  ok = validateField('accountName') && ok;
+
+  if(!ok){ window.scrollTo({top:0,behavior:'smooth'}); return; }
+
+  var btn = document.getElementById('submitBtn');
+  btn.textContent = 'שולח...';
+  btn.disabled = true;
+
+  var sigData = hasSig ? canvas.toDataURL('image/png') : '';
+
+  var payload = {
+    fullName:    document.getElementById('fullName').value,
+    idNum:       document.getElementById('idNum').value,
+    phone:       document.getElementById('phone').value,
+    email:       document.getElementById('email').value,
+    address:     document.getElementById('address').value,
+    birthDate:   document.getElementById('birthDate').value,
+    gender:      document.getElementById('gender').value,
+    role:        document.getElementById('role').value,
+    startDate:   document.getElementById('startDate').value,
+    bank:        document.getElementById('bank').value,
+    branch:      document.getElementById('branch').value,
+    bankNum:     document.getElementById('bankNum').value,
+    accountName: document.getElementById('accountName').value,
+    signature:   sigData
+  };
+
+  fetch(FORM_SCRIPT_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify({action: 'submitEmployeeForm', payload: payload})
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(){
+    document.getElementById('formWrap').style.display = 'none';
+    document.getElementById('successScreen').style.display = 'block';
+    document.getElementById('progressBar').style.width = '100%';
+  })
+  .catch(function(){
+    btn.textContent = 'שלח טופס ✉️';
+    btn.disabled = false;
+    alert('שגיאה בשליחה — נסה שוב');
+  });
+}
+</script>
+</body>
+</html>
