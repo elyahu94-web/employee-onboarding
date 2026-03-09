@@ -22,6 +22,7 @@
   input:focus{border-color:var(--accent2);background:white;}
   .btn{width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:13px;font-size:.95rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:14px;transition:background .2s;}
   .btn:hover{background:var(--accent2);}
+  .btn:disabled{opacity:.6;cursor:not-allowed;}
   .btn.gray{background:#888;margin-top:10px;}.btn.gray:hover{background:#666;}
   .result-box{display:none;background:#edf7f1;border:1.5px solid #a8d5b8;border-radius:10px;padding:16px;margin-top:16px;}
   .result-name{font-weight:700;font-size:.95rem;margin-bottom:10px;color:var(--accent);}
@@ -40,6 +41,7 @@
   .empty-list{color:var(--ink3);font-size:.88rem;text-align:center;padding:16px 0;}
   #loginWrap{max-width:360px;margin:80px auto;padding:0 20px;}
   .err{color:var(--red);font-size:.82rem;margin-top:8px;display:none;}
+  .err-box{background:#fdecea;border:1.5px solid #f5c6cb;border-radius:8px;padding:12px;margin-top:12px;font-size:.85rem;color:var(--red);display:none;}
 </style>
 </head>
 <body>
@@ -64,7 +66,8 @@
     <div class="card-title">🔗 יצירת קישור חד-פעמי</div>
     <label>שם העובד</label>
     <input type="text" id="workerName" placeholder="למשל: חוסני מחמד" onkeydown="if(event.key==='Enter')generateLink()">
-    <button class="btn" onclick="generateLink()">צור קישור</button>
+    <button class="btn" id="genBtn" onclick="generateLink()">צור קישור</button>
+    <div class="err-box" id="genErr"></div>
     <div class="result-box" id="resultBox">
       <div class="result-name" id="resultName"></div>
       <div class="link-row">
@@ -76,24 +79,22 @@
   </div>
   <div class="card">
     <div class="card-title">📋 קישורים שנשלחו</div>
-    <div id="linksList"><div class="empty-list">אין קישורים עדיין</div></div>
+    <div id="linksList"><div class="empty-list">טוען...</div></div>
     <button class="btn gray" onclick="clearDone()">🗑 מחק מולאו</button>
-    <button class="btn gray" onclick="clearAll()">🗑 נקה הכל</button>
   </div>
 </div>
 </div>
 
 <script>
-var SCRIPT_URL  = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ9df7VL4RZpLfO5XwUeDDNsOBDv6TK_Izx4T0ZI8JgvF1x/exec";
-var FORM_BASE   = "https://elyahu94-web.github.io/employee-onboarding/";
-var ADMIN_PASS  = "orsid2026";
-var SK          = "orsid_links_v2";
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ9df7VL4RZpLfO5XwUeDDNsOBDv6TK_Izx4T0ZI8JgvF1x/exec";
+var FORM_BASE  = "https://elyahu94-web.github.io/employee-onboarding/";
+var ADMIN_PASS = "orsid2026";
 
 function login(){
   if(document.getElementById('pwInput').value===ADMIN_PASS){
     document.getElementById('loginWrap').style.display='none';
     document.getElementById('mainWrap').style.display='block';
-    renderList();
+    loadList();
   } else {
     document.getElementById('pwErr').style.display='block';
   }
@@ -105,33 +106,49 @@ function makeToken(){
   return t;
 }
 
+function api(action, payload){
+  return fetch(SCRIPT_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:action, payload:payload||{}}),
+    redirect:'follow'
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(d.status==='error') throw new Error(d.message);
+    return d.data;
+  });
+}
+
 function generateLink(){
   var name=document.getElementById('workerName').value.trim();
   if(!name){alert('הזן שם עובד');return;}
+  var btn=document.getElementById('genBtn');
+  var errBox=document.getElementById('genErr');
+  btn.textContent='יוצר קישור...';
+  btn.disabled=true;
+  errBox.style.display='none';
+  document.getElementById('resultBox').style.display='none';
+
   var token=makeToken();
-  var link=FORM_BASE+'?token='+token;
-  var now=new Date();
-  var date=now.getDate()+'/'+(now.getMonth()+1)+'/'+now.getFullYear()+
-    ' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
 
-  // שמור ב-localStorage
-  var list=getList();
-  list.unshift({token:token,name:name,date:date,used:false});
-  saveList(list);
-  renderList();
-
-  // שלח לשרת ברקע
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:'generateFormToken',payload:{workerName:name,token:token}}),
-    redirect:'follow'}).catch(function(){});
-
-  // הצג תוצאה
-  document.getElementById('resultName').textContent='✅ קישור נוצר עבור: '+name;
-  document.getElementById('resultLink').textContent=link;
-  document.getElementById('resultBox').style.display='block';
-  document.getElementById('waBtn').href='https://wa.me/?text='+
-    encodeURIComponent('שלום '+name+',\nאנא מלא את טופס פרטי העובד:\n'+link);
-  document.getElementById('workerName').value='';
+  api('generateFormToken',{workerName:name, token:token})
+  .then(function(){
+    var link=FORM_BASE+'?token='+token;
+    document.getElementById('resultName').textContent='✅ קישור נוצר עבור: '+name;
+    document.getElementById('resultLink').textContent=link;
+    document.getElementById('resultBox').style.display='block';
+    document.getElementById('waBtn').href='https://wa.me/?text='+
+      encodeURIComponent('שלום '+name+',\nאנא מלא את טופס פרטי העובד:\n'+link);
+    document.getElementById('workerName').value='';
+    loadList();
+  })
+  .catch(function(err){
+    errBox.textContent='שגיאה: לא ניתן ליצור קישור — '+err.message;
+    errBox.style.display='block';
+  })
+  .finally(function(){
+    btn.textContent='צור קישור';
+    btn.disabled=false;
+  });
 }
 
 function copyLink(){
@@ -148,59 +165,47 @@ function copyTokenLink(token){
     .then(function(){alert('הועתק ✅');});
 }
 
-function getList(){ try{return JSON.parse(localStorage.getItem(SK))||[];}catch(e){return[];} }
-function saveList(l){ localStorage.setItem(SK,JSON.stringify(l)); }
-function clearDone(){ if(!confirm('למחוק קישורים שמולאו?')) return; saveList(getList().filter(function(i){return !i.used;})); renderList(); }
-function clearAll(){ if(!confirm('למחוק את כל הרשימה?')) return; localStorage.removeItem(SK); renderList(); }
+function loadList(){
+  api('getFormTokens',{})
+  .then(function(list){
+    renderList(list||[]);
+  })
+  .catch(function(){
+    document.getElementById('linksList').innerHTML='<div class="empty-list">שגיאה בטעינה</div>';
+  });
+}
 
-function deleteLink(token) {
+function deleteLink(token){
   if(!confirm('למחוק קישור זה לצמיתות?')) return;
-  // מחק מהשרת
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:'deleteFormToken',payload:{token:token}}),
-    redirect:'follow'}).catch(function(){});
-  // מחק מ-localStorage
-  saveList(getList().filter(function(i){ return i.token !== token; }));
-  renderList();
+  api('deleteFormToken',{token:token})
+  .then(function(){ loadList(); })
+  .catch(function(){ alert('שגיאה במחיקה'); });
 }
 
-function syncStatus() {
-  var list = getList();
-  if (!list.length) return;
-  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:'getFormTokens',payload:{}}),
-    redirect:'follow'})
-  .then(function(r){ return r.json(); })
-  .then(function(d){
-    var serverList = d.data || [];
-    if (!serverList.length) return;
-    var map = {};
-    serverList.forEach(function(s){ map[s.token] = s; });
-    var changed = false;
-    list.forEach(function(item){
-      if (map[item.token] && map[item.token].used && !item.used) {
-        item.used = true;
-        item.filledTime = map[item.token].time || '';
-        changed = true;
-      }
-    });
-    if (changed) { saveList(list); renderList(); }
-  }).catch(function(){});
+function clearDone(){
+  if(!confirm('למחוק את כל הקישורים שמולאו?')) return;
+  api('getFormTokens',{}).then(function(list){
+    var done=(list||[]).filter(function(i){return i.used;});
+    var promises=done.map(function(i){ return api('deleteFormToken',{token:i.token}); });
+    Promise.all(promises).then(function(){ loadList(); });
+  });
 }
 
-function renderList(){
-  var list=getList(),el=document.getElementById('linksList');
+function renderList(list){
+  var el=document.getElementById('linksList');
   if(!list.length){el.innerHTML='<div class="empty-list">אין קישורים עדיין</div>';return;}
   el.innerHTML='';
   list.forEach(function(item){
     var link=FORM_BASE+'?token='+item.token;
     var badge=item.used
-      ?'<span class="badge badge-done">✅ מולא'+(item.filledTime?' · '+item.filledTime:'')+'</span>'
+      ?'<span class="badge badge-done">✅ מולא'+(item.time?' · '+item.time:'')+'</span>'
       :'<span class="badge badge-pending">⏳ ממתין</span>';
     var d=document.createElement('div');
     d.className='link-item';
-    d.innerHTML='<div class="link-item-top"><span class="link-item-name">'+item.name+'</span>'+badge
-      +'<button onclick="deleteLink(\''+item.token+'\')" style="margin-right:auto;background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;padding:2px 6px" title="מחק קישור">🗑</button></div>'
+    d.innerHTML='<div class="link-item-top">'
+      +'<span class="link-item-name">'+item.name+'</span>'+badge
+      +'<button onclick="deleteLink(\''+item.token+'\')" style="margin-right:auto;background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;padding:2px 6px" title="מחק">🗑</button>'
+      +'</div>'
       +'<div class="link-item-date">'+item.date+'</div>'
       +(!item.used
         ?'<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
@@ -210,8 +215,6 @@ function renderList(){
         :'');
     el.appendChild(d);
   });
-  // סנכרן סטטוס מהשרת בשקט
-  syncStatus();
 }
 </script>
 </body>
