@@ -153,6 +153,41 @@ function saveList(l){ localStorage.setItem(SK,JSON.stringify(l)); }
 function clearDone(){ if(!confirm('למחוק קישורים שמולאו?')) return; saveList(getList().filter(function(i){return !i.used;})); renderList(); }
 function clearAll(){ if(!confirm('למחוק את כל הרשימה?')) return; localStorage.removeItem(SK); renderList(); }
 
+function deleteLink(token) {
+  if(!confirm('למחוק קישור זה לצמיתות?')) return;
+  // מחק מהשרת
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'deleteFormToken',payload:{token:token}}),
+    redirect:'follow'}).catch(function(){});
+  // מחק מ-localStorage
+  saveList(getList().filter(function(i){ return i.token !== token; }));
+  renderList();
+}
+
+function syncStatus() {
+  var list = getList();
+  if (!list.length) return;
+  fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'getFormTokens',payload:{}}),
+    redirect:'follow'})
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var serverList = d.data || [];
+    if (!serverList.length) return;
+    var map = {};
+    serverList.forEach(function(s){ map[s.token] = s; });
+    var changed = false;
+    list.forEach(function(item){
+      if (map[item.token] && map[item.token].used && !item.used) {
+        item.used = true;
+        item.filledTime = map[item.token].time || '';
+        changed = true;
+      }
+    });
+    if (changed) { saveList(list); renderList(); }
+  }).catch(function(){});
+}
+
 function renderList(){
   var list=getList(),el=document.getElementById('linksList');
   if(!list.length){el.innerHTML='<div class="empty-list">אין קישורים עדיין</div>';return;}
@@ -160,11 +195,12 @@ function renderList(){
   list.forEach(function(item){
     var link=FORM_BASE+'?token='+item.token;
     var badge=item.used
-      ?'<span class="badge badge-done">✅ מולא</span>'
+      ?'<span class="badge badge-done">✅ מולא'+(item.filledTime?' · '+item.filledTime:'')+'</span>'
       :'<span class="badge badge-pending">⏳ ממתין</span>';
     var d=document.createElement('div');
     d.className='link-item';
-    d.innerHTML='<div class="link-item-top"><span class="link-item-name">'+item.name+'</span>'+badge+'</div>'
+    d.innerHTML='<div class="link-item-top"><span class="link-item-name">'+item.name+'</span>'+badge
+      +'<button onclick="deleteLink(\''+item.token+'\')" style="margin-right:auto;background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;padding:2px 6px" title="מחק קישור">🗑</button></div>'
       +'<div class="link-item-date">'+item.date+'</div>'
       +(!item.used
         ?'<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
@@ -174,6 +210,8 @@ function renderList(){
         :'');
     el.appendChild(d);
   });
+  // סנכרן סטטוס מהשרת בשקט
+  syncStatus();
 }
 </script>
 </body>
