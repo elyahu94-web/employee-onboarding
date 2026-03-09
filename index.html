@@ -980,9 +980,7 @@ function submitForm(){
     payload.files = { tz: files[0], toshav: files[1], extra: files[2] };
     _doFetchSubmit(payload);
   });
-  return; // _doFetchSubmit ימשיך
-
-_doFetchSubmit(payload); // המשך בפונקציה נפרדת
+  return; // _doFetchSubmit ממשיך בתוך Promise
 }
 
 function _doFetchSubmit(payload){
