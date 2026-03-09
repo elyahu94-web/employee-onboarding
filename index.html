@@ -438,7 +438,7 @@
 
 <script>
 // ===== Apps Script URL — החלף כאן =====
-var FORM_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ9df7VL4RZpLfO5XwUeDDNsOBDv6TK_Izx4T0ZI8JgvF1x/exec";
+var FORM_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
 var _token = null;
 
 // בדוק token מה-URL
@@ -452,7 +452,12 @@ var _token = null;
     document.getElementById('errorMsg').textContent = 'לא ניתן לגשת לטופס ישירות. יש לפנות למשאבי אנוש לקבלת קישור אישי.';
     return;
   }
-  // בדוק תקינות token
+  // פתח טופס ישירות — בדיקת שימוש כפול תיעשה בעת השליחה
+  document.getElementById('loadingScreen').style.display = 'none';
+  _token = token;
+  document.getElementById('formWrap').style.display = 'block';
+
+  // בדוק ברקע אם כבר מולא
   fetch(FORM_SCRIPT_URL, {
     method:'POST',
     headers:{'Content-Type':'text/plain'},
@@ -462,29 +467,30 @@ var _token = null;
   .then(function(r){ return r.json(); })
   .then(function(d){
     var res = d.data || d;
-    document.getElementById('loadingScreen').style.display = 'none';
-    if(res.valid){
-      _token = token;
-      // מלא שם עובד אוטומטית אם יש
-      if(res.name) document.getElementById('fullName').value = res.name;
-      document.getElementById('formWrap').style.display = 'block';
-    } else {
+    if(res && res.valid === false && res.reason === 'used'){
+      document.getElementById('formWrap').style.display = 'none';
       document.getElementById('errorScreen').style.display = 'block';
-      if(res.reason === 'used'){
-        document.getElementById('errorTitle').textContent = 'הטופס כבר מולא ✅';
-        document.getElementById('errorMsg').textContent = 'הפרטים שלך כבר התקבלו. אין צורך למלא שוב.';
-      } else {
-        document.getElementById('errorTitle').textContent = 'קישור לא תקין';
-        document.getElementById('errorMsg').textContent = 'הקישור פג תוקף או אינו תקין. פנה למשאבי אנוש.';
-      }
+      document.getElementById('errorTitle').textContent = 'הטופס כבר מולא ✅';
+      document.getElementById('errorMsg').textContent = 'הפרטים שלך כבר התקבלו. אין צורך למלא שוב.';
+    } else if(res && res.name){
+      document.getElementById('fullName').value = res.name;
     }
   })
   .catch(function(){
-    // אם יש CORS error — הנח שהכל בסדר ותן גישה
+    // CORS error = Apps Script קיבל — תן גישה לטופס
     document.getElementById('loadingScreen').style.display = 'none';
     _token = token;
     document.getElementById('formWrap').style.display = 'block';
   });
+
+  // timeout — אם תוך 6 שניות אין תשובה, תן גישה
+  setTimeout(function(){
+    if(document.getElementById('loadingScreen').style.display !== 'none'){
+      document.getElementById('loadingScreen').style.display = 'none';
+      _token = token;
+      document.getElementById('formWrap').style.display = 'block';
+    }
+  }, 6000);
 })();
 
 // ===== חתימה =====
