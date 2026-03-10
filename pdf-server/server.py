@@ -28,7 +28,7 @@ def add_signature_to_pdf(pdf_path, sig_data_uri, output_path):
     c = canvas.Canvas(packet, pagesize=(595.275, 841.89))
     
     # קואורדינטות SIGN_SIG (עמוד 2, reportlab y מלמטה)
-    sig_x, sig_y, sig_w, sig_h = 45.0, 176.9, 81.5, 29.7
+    sig_x, sig_y, sig_w, sig_h = 155.0, 171.9, 120.0, 35.0
     
     # שמור תמונה זמנית
     img_buffer = BytesIO()
