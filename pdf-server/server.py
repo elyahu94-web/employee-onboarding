@@ -9,6 +9,50 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+
+def add_signature_to_pdf(pdf_path, sig_data_uri, output_path):
+    """מצייר חתימה על עמוד 2 של ה-PDF"""
+    from pypdf import PdfReader, PdfWriter
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.utils import ImageReader
+    from io import BytesIO
+    from PIL import Image
+
+    # פענח base64
+    header, b64 = sig_data_uri.split(',', 1)
+    img_bytes = base64.b64decode(b64)
+    img = Image.open(BytesIO(img_bytes)).convert('RGBA')
+
+    # צור PDF שכבה עם החתימה
+    packet = BytesIO()
+    c = canvas.Canvas(packet, pagesize=(595.275, 841.89))
+    
+    # קואורדינטות SIGN_SIG (עמוד 2, reportlab y מלמטה)
+    sig_x, sig_y, sig_w, sig_h = 45.0, 182.0, 120.0, 25.0
+    
+    # שמור תמונה זמנית
+    img_buffer = BytesIO()
+    img.save(img_buffer, format='PNG')
+    img_buffer.seek(0)
+    c.drawImage(ImageReader(img_buffer), sig_x, sig_y, width=sig_w, height=sig_h, mask='auto')
+    c.save()
+    packet.seek(0)
+
+    # מזג עם ה-PDF
+    reader = PdfReader(pdf_path)
+    writer = PdfWriter()
+    overlay_reader = PdfReader(packet)
+
+    for i, page in enumerate(reader.pages):
+        if i == 1:  # עמוד 2
+            page.merge_page(overlay_reader.pages[0])
+        writer.add_page(page)
+
+    with open(output_path, 'wb') as f:
+        writer.write(f)
+    
+    return output_path
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_TEMPLATE = os.path.join(BASE_DIR, 'tofes-101.pdf')
 FIELDS_TEMPLATE = os.path.join(BASE_DIR, 'fields_template_final.json')
@@ -175,7 +219,7 @@ def build_fields_json(data: dict) -> dict:
 
     # חתימה ותאריך
     values['{{SIGN_DATE}}'] = data.get('signDate', '')
-    values['{{SIGN_SIG}}']  = data.get('signSig', '')  # טקסט בלבד, חתימה תמונה = עתיד
+    values['{{SIGN_SIG}}']  = ''  # מטופל כתמונה ב-add_signature_to_pdf
 
     # --- החלף placeholders בשדות ---
     for field in fields['form_fields']:
@@ -205,24 +249,35 @@ def fill_form():
 
         with tempfile.TemporaryDirectory() as tmpdir:
             fields_path = os.path.join(tmpdir, 'fields.json')
-            output_path = os.path.join(tmpdir, 'filled.pdf')
+            filled_path = os.path.join(tmpdir, 'filled.pdf')
+            output_path = os.path.join(tmpdir, 'output.pdf')
 
             with open(fields_path, 'w', encoding='utf-8') as f:
                 json.dump(fields, f, ensure_ascii=False)
 
-            # הרץ סקריפט מילוי
+            # הרץ סקריפט מילוי טקסט
             result = subprocess.run(
-                ['python3', FILL_SCRIPT, PDF_TEMPLATE, fields_path, output_path],
+                ['python3', FILL_SCRIPT, PDF_TEMPLATE, fields_path, filled_path],
                 capture_output=True, text=True
             )
 
             if result.returncode != 0:
                 return jsonify({'error': 'Fill failed', 'details': result.stderr}), 500
 
-            if not os.path.exists(output_path):
+            if not os.path.exists(filled_path):
                 return jsonify({'error': 'Output PDF not created'}), 500
 
-            with open(output_path, 'rb') as f:
+            # הוסף חתימה כתמונה אם יש
+            sig_b64 = data.get('signSig', '')
+            if sig_b64 and sig_b64.startswith('data:image'):
+                try:
+                    final_path = add_signature_to_pdf(filled_path, sig_b64, output_path)
+                except Exception as e:
+                    final_path = filled_path
+            else:
+                final_path = filled_path
+
+            with open(final_path, 'rb') as f:
                 pdf_b64 = base64.b64encode(f.read()).decode()
 
         return jsonify({'pdf': pdf_b64})
