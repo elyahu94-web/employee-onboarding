@@ -3,4 +3,4 @@ gunicorn
 pypdf
 reportlab
 Pillow
-python-bidi
+python-bidi==0.4.2
