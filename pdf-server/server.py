@@ -28,7 +28,7 @@ def add_signature_to_pdf(pdf_path, sig_data_uri, output_path):
     c = canvas.Canvas(packet, pagesize=(595.275, 841.89))
     
     # קואורדינטות SIGN_SIG (עמוד 2, reportlab y מלמטה)
-    sig_x, sig_y, sig_w, sig_h = 30.0, 171.9, 120.0, 35.0
+    sig_x, sig_y, sig_w, sig_h = 10.0, 171.9, 120.0, 35.0
     
     # שמור תמונה זמנית
     img_buffer = BytesIO()
@@ -189,6 +189,7 @@ def build_fields_json(data: dict) -> dict:
         'EX_RESIDENT': 'resident',
         'EX_DISABLED_A': 'disabledA',
         'EX_DISABLED_B': 'disabledB',
+        'EX_YISHUV': 'yishuv',
         'EX_OLEH': 'oleh',
         'EX_SPOUSE': 'spouse',
         'EX_SINGLE_PAR': 'singlePar',
