@@ -342,6 +342,38 @@
       </div>
     </div>
 
+
+    <!-- ז. שינויים במהלך השנה -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">🔄</div>ז. שינויים במהלך השנה</div>
+      <div class="section-body">
+        <p style="font-size:.8rem;color:var(--ink3);margin-bottom:12px">אם חל שינוי בפרטים — יש להצהיר על כך תוך שבוע ימים</p>
+        <div id="changesBody">
+          <div class="subsection" style="margin-bottom:10px">
+            <div class="row">
+              <div class="field"><label>תאריך השינוי</label><input type="date" id="ch1_date"></div>
+              <div class="field"><label>פרטי השינוי</label><input type="text" id="ch1_details" placeholder="תאר את השינוי"></div>
+            </div>
+            <div class="field" style="margin-top:8px"><label>תאריך ההודעה</label><input type="date" id="ch1_notify" style="max-width:220px"></div>
+          </div>
+          <div class="subsection" style="margin-bottom:10px">
+            <div class="row">
+              <div class="field"><label>תאריך השינוי</label><input type="date" id="ch2_date"></div>
+              <div class="field"><label>פרטי השינוי</label><input type="text" id="ch2_details" placeholder="תאר את השינוי"></div>
+            </div>
+            <div class="field" style="margin-top:8px"><label>תאריך ההודעה</label><input type="date" id="ch2_notify" style="max-width:220px"></div>
+          </div>
+          <div class="subsection">
+            <div class="row">
+              <div class="field"><label>תאריך השינוי</label><input type="date" id="ch3_date"></div>
+              <div class="field"><label>פרטי השינוי</label><input type="text" id="ch3_details" placeholder="תאר את השינוי"></div>
+            </div>
+            <div class="field" style="margin-top:8px"><label>תאריך ההודעה</label><input type="date" id="ch3_notify" style="max-width:220px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- מסמכים -->
     <div class="section">
       <div class="section-header"><div class="section-icon">📎</div>מסמכים לצירוף</div>
@@ -580,6 +612,11 @@ function submitForm(){
       miluim:chk('ex16'),miluimDays:vf('ex16_days')
     },
     taxCoord:radio('taxCoord'),
+    changes:[
+      {date:vf('ch1_date'),details:vf('ch1_details'),notify:vf('ch1_notify')},
+      {date:vf('ch2_date'),details:vf('ch2_details'),notify:vf('ch2_notify')},
+      {date:vf('ch3_date'),details:vf('ch3_details'),notify:vf('ch3_notify')}
+    ].filter(function(c){return c.date||c.details;}),
     sig101:hasSig?canvas.toDataURL('image/png'):''
   };
 
