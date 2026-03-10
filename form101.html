@@ -104,6 +104,39 @@
     <div class="page-title">טופס 101 — כרטיס עובד</div>
     <div class="page-sub">שנת מס: <strong id="taxYearLabel"></strong> &nbsp;|&nbsp; לפי תקנות מס הכנסה, התשנ"ג-1993</div>
 
+    <!-- א. פרטים אישיים -->
+    <div class="section">
+      <div class="section-header"><div class="section-icon">🪪</div>א. פרטים אישיים</div>
+      <div class="section-body">
+        <div class="row">
+          <div class="field"><label>שם משפחה <span class="req">*</span></label><input type="text" id="lastName" placeholder="כהן"></div>
+          <div class="field"><label>שם פרטי <span class="req">*</span></label><input type="text" id="firstName" placeholder="ישראל"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>מספר זהות <span class="req">*</span></label><input type="text" id="idNum" maxlength="9" placeholder="123456789"></div>
+          <div class="field"><label>תאריך לידה <span class="req">*</span></label><input type="date" id="birthDate"></div>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>מין</label>
+            <div class="radio-group" style="flex-direction:row;gap:24px;margin-top:6px">
+              <label><input type="radio" name="gender" value="M"> זכר</label>
+              <label><input type="radio" name="gender" value="F"> נקבה</label>
+            </div>
+          </div>
+          <div class="field"><label>טלפון נייד <span class="req">*</span></label><input type="text" id="phone" placeholder="050-1234567"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>אימייל</label><input type="text" id="email" placeholder="israel@example.com"></div>
+          <div class="field"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>רחוב ומספר <span class="req">*</span></label><input type="text" id="street" placeholder="הרצל 1"></div>
+          <div class="field"><label>עיר <span class="req">*</span></label><input type="text" id="city" placeholder="תל אביב"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ב. מצב אישי -->
     <div class="section">
       <div class="section-header"><div class="section-icon">👤</div>ב. פרטים אישיים</div>
