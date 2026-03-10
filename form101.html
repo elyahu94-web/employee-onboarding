@@ -336,8 +336,48 @@
       <div class="section-body">
         <div class="radio-group">
           <label><input type="radio" name="taxCoord" value="לא היתה לי הכנסה מתחילת השנה"> <span><strong>1.</strong> לא הייתה לי הכנסה מתחילת שנת המס עד תחילת עבודה זו</span></label>
-          <label><input type="radio" name="taxCoord" value="יש לי הכנסות נוספות ממשכורת"> <span><strong>2.</strong> יש לי הכנסות נוספות ממשכורת</span></label>
-          <label><input type="radio" name="taxCoord" value="אישור פקיד שומה"> <span><strong>3.</strong> פקיד השומה אישר תיאום — מצורף אישור</span></label>
+          <label><input type="radio" name="taxCoord" value="יש לי הכנסות נוספות ממשכורת" onchange="toggleTCRows(true)"> <span><strong>2.</strong> יש לי הכנסות נוספות ממשכורת</span></label>
+          <label><input type="radio" name="taxCoord" value="אישור פקיד שומה" onchange="toggleTCRows(false)"> <span><strong>3.</strong> פקיד השומה אישר תיאום — מצורף אישור</span></label>
+          <div id="tcRowsBox" style="display:none;margin-top:14px;overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+              <thead>
+                <tr style="background:#f0ede6">
+                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">שם המעסיק/משלם</th>
+                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">כתובת</th>
+                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">מס' תיק ניכויים</th>
+                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">סוג הכנסה</th>
+                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">הכנסה חודשית</th>
+                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">מס שנוכה</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding:4px"><input type="text" id="tc1_emp" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc1_addr" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc1_tik" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc1_type" style="width:80px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="number" id="tc1_income" placeholder="0" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="number" id="tc1_tax" placeholder="0" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                </tr>
+                <tr>
+                  <td style="padding:4px"><input type="text" id="tc2_emp" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc2_addr" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc2_tik" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc2_type" style="width:80px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="number" id="tc2_income" placeholder="0" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="number" id="tc2_tax" placeholder="0" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                </tr>
+                <tr>
+                  <td style="padding:4px"><input type="text" id="tc3_emp" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc3_addr" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc3_tik" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="text" id="tc3_type" style="width:80px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="number" id="tc3_income" placeholder="0" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                  <td style="padding:4px"><input type="number" id="tc3_tax" placeholder="0" style="width:90px;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -484,6 +524,13 @@ function radio(name){var e=document.querySelector('input[name="'+name+'"]:checke
 function showSub(id,show){var el=document.getElementById(id);if(el)el.style.display=show?'block':'none';}
 function toggleSpouse(){var v=vf('maritalStatus');showSub('spouseSection',v==='נשוי/אה'||v==='פרוד/ה');}
 function toggleOI(show){showSub('oiBox',show);}
+function toggleTCRows(show){
+  showSub('tcRowsBox',show);
+  // אפס radio אחרים
+  if(show) document.querySelectorAll('input[name="taxCoord"]').forEach(function(r){
+    if(r.value!=='יש לי הכנסות נוספות ממשכורת') r.checked=false;
+  });
+}
 
 // ===== FILE PREVIEW =====
 function previewFile(inputId,previewId,labelId){
@@ -612,6 +659,11 @@ function submitForm(){
       miluim:chk('ex16'),miluimDays:vf('ex16_days')
     },
     taxCoord:radio('taxCoord'),
+    taxCoordRows:[
+      {employer:vf('tc1_emp'),addr:vf('tc1_addr'),tik:vf('tc1_tik'),type:vf('tc1_type'),income:vf('tc1_income'),tax:vf('tc1_tax')},
+      {employer:vf('tc2_emp'),addr:vf('tc2_addr'),tik:vf('tc2_tik'),type:vf('tc2_type'),income:vf('tc2_income'),tax:vf('tc2_tax')},
+      {employer:vf('tc3_emp'),addr:vf('tc3_addr'),tik:vf('tc3_tik'),type:vf('tc3_type'),income:vf('tc3_income'),tax:vf('tc3_tax')}
+    ].filter(function(r){return r.employer||r.income;}),
     changes:[
       {date:vf('ch1_date'),details:vf('ch1_details'),notify:vf('ch1_notify')},
       {date:vf('ch2_date'),details:vf('ch2_details'),notify:vf('ch2_notify')},
