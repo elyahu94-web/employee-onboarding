@@ -62,6 +62,18 @@ with open(FIELDS_TEMPLATE, encoding='utf-8') as f:
     FIELDS_TEMPLATE_DATA = json.load(f)
 
 
+def fmt_date(d):
+    """ממיר YYYY-MM-DD ל-DD/MM/YYYY"""
+    if not d:
+        return ''
+    d = str(d).strip()
+    if '-' in d and len(d) == 10:
+        parts = d.split('-')
+        if len(parts) == 3:
+            return parts[2] + '/' + parts[1] + '/' + parts[0]
+    return d
+
+
 def build_fields_json(data: dict) -> dict:
     """ממיר נתוני טופס לפורמט fields.json לסקריפט המילוי"""
     fields = copy.deepcopy(FIELDS_TEMPLATE_DATA)
@@ -74,8 +86,8 @@ def build_fields_json(data: dict) -> dict:
     values['{{ID_NUM}}']        = data.get('idNum', '')
     values['{{LAST_NAME}}']     = data.get('lastName', '')
     values['{{FIRST_NAME}}']    = data.get('firstName', '')
-    values['{{BIRTH_DATE}}']    = data.get('birthDate', '')
-    values['{{ALIYA_DATE}}']    = data.get('aliyaDate', '')
+    values['{{BIRTH_DATE}}']    = fmt_date(data.get('birthDate', ''))
+    values['{{ALIYA_DATE}}']    = fmt_date(data.get('aliyaDate', ''))
     values['{{STREET}}']        = data.get('street', '')
     values['{{CITY}}']          = data.get('city', '')
     values['{{EMAIL}}']         = data.get('email', '')
@@ -117,7 +129,7 @@ def build_fields_json(data: dict) -> dict:
     values['{{KIBBUTZ_YES2}}'] = 'X' if kibbutz == 'YES2' else ''
 
     # תחילת עבודה בשנה הנוכחית
-    values['{{START_THIS_YEAR}}'] = data.get('startThisYear', '')
+    values['{{START_THIS_YEAR}}'] = fmt_date(data.get('startThisYear', ''))
 
     # סוג הכנסה (ד)
     income_type = data.get('incomeType', '')
@@ -142,7 +154,7 @@ def build_fields_json(data: dict) -> dict:
     for i, child in enumerate(children[:13], 1):
         values[f'{{{{CHILD{i}_NAME}}}}']    = child.get('name', '')
         values[f'{{{{CHILD{i}_ID}}}}']      = child.get('id', '')
-        values[f'{{{{CHILD{i}_BIRTH}}}}']   = child.get('birth', '')
+        values[f'{{{{CHILD{i}_BIRTH}}}}']   = fmt_date(child.get('birth', ''))
         values[f'{{{{CHILD{i}_CUSTODY}}}}'] = 'X' if child.get('custody') else ''
         values[f'{{{{CHILD{i}_KITZBA}}}}']  = 'X' if child.get('kitzba') else ''
 
@@ -151,8 +163,8 @@ def build_fields_json(data: dict) -> dict:
     values['{{SPOUSE_ID}}']       = spouse.get('id', '')
     values['{{SPOUSE_LAST}}']     = spouse.get('lastName', '')
     values['{{SPOUSE_FIRST}}']    = spouse.get('firstName', '')
-    values['{{SPOUSE_BIRTH}}']    = spouse.get('birthDate', '')
-    values['{{SPOUSE_ALIYA}}']    = spouse.get('aliyaDate', '')
+    values['{{SPOUSE_BIRTH}}']    = fmt_date(spouse.get('birthDate', ''))
+    values['{{SPOUSE_ALIYA}}']    = fmt_date(spouse.get('aliyaDate', ''))
     values['{{SPOUSE_PASSPORT}}'] = spouse.get('passport', '')
     values['{{SPOUSE_NO_INCOME}}']     = 'X' if spouse.get('income') == 'NO' else ''
     values['{{SPOUSE_HAS_INCOME}}']    = 'X' if spouse.get('income') == 'YES' else ''
@@ -195,10 +207,10 @@ def build_fields_json(data: dict) -> dict:
     for ph_key, data_key in ex_map.items():
         values[f'{{{{{ph_key}}}}}'] = 'X' if exemptions.get(data_key) else ''
 
-    values['{{EX_YISHUV_DATE}}'] = exemptions.get('yishuvDate', '')
-    values['{{EX_OLEH_DATE}}']   = exemptions.get('olehDate', '')
-    values['{{EX_ARMY_START}}']  = exemptions.get('armyStart', '')
-    values['{{EX_ARMY_END}}']    = exemptions.get('armyEnd', '')
+    values['{{EX_YISHUV_DATE}}'] = fmt_date(exemptions.get('yishuvDate', ''))
+    values['{{EX_OLEH_DATE}}']   = fmt_date(exemptions.get('olehDate', ''))
+    values['{{EX_ARMY_START}}']  = fmt_date(exemptions.get('armyStart', ''))
+    values['{{EX_ARMY_END}}']    = fmt_date(exemptions.get('armyEnd', ''))
     values['{{EX_MILUIM_DAYS}}'] = exemptions.get('miluimDays', '')
 
     # ט. תיאום מס
@@ -218,7 +230,7 @@ def build_fields_json(data: dict) -> dict:
         values[f'{{{{TC_ROW{i}_TAX}}}}']       = row.get('tax', '')
 
     # חתימה ותאריך
-    values['{{SIGN_DATE}}'] = data.get('signDate', '')
+    values['{{SIGN_DATE}}'] = fmt_date(data.get('signDate', ''))
     values['{{SIGN_SIG}}']  = ''  # מטופל כתמונה ב-add_signature_to_pdf
 
     # --- החלף placeholders בשדות ---

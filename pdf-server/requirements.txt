@@ -3,3 +3,4 @@ gunicorn
 pypdf
 reportlab
 Pillow
+python-bidi
