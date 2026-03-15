@@ -59,9 +59,12 @@
   .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
   .submit-area{margin-top:24px;text-align:center;}
   .progress-wrap{display:none;margin-top:16px;}
-  .progress-bar-bg{background:#e0ddd6;border-radius:20px;height:8px;overflow:hidden;margin:10px 0;}
-  .progress-bar-fill{background:var(--accent2);height:100%;width:0%;border-radius:20px;transition:width .5s ease;}
-  .progress-label{font-size:.82rem;color:var(--ink3);text-align:center;}
+  .progress-bar-bg{background:#e0ddd6;border-radius:20px;height:10px;overflow:hidden;margin:8px 0;}
+  .progress-bar-fill{background:linear-gradient(90deg,var(--accent),var(--accent2));height:100%;width:0%;border-radius:20px;transition:width .1s linear;}
+  .progress-top{display:flex;justify-content:space-between;align-items:center;}
+  .progress-pct{font-size:1.15rem;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;min-width:52px;text-align:left;}
+  .progress-label{font-size:.82rem;color:var(--ink2);font-weight:600;}
+  .progress-step{font-size:.75rem;color:var(--ink3);text-align:center;margin-top:5px;}
   .success-screen{display:none;text-align:center;padding:60px 20px;}
   .success-icon{width:76px;height:76px;background:#d4edda;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 18px;animation:pop .4s ease;}
   @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
@@ -442,8 +445,12 @@
     <div class="submit-area">
       <button class="btn-submit" id="submitBtn" onclick="submitForm()">שלח טופס 101 ✉️</button>
       <div class="progress-wrap" id="progressWrap">
+        <div class="progress-top">
+          <div class="progress-label" id="progressLabel">מכין נתונים...</div>
+          <div class="progress-pct" id="progressPct">0.0%</div>
+        </div>
         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
-        <div class="progress-label" id="progressLabel">מכין...</div>
+        <div class="progress-step" id="progressStep">⏳ אנא המתן, אל תסגור את הדף</div>
       </div>
     </div>
   </div>
@@ -499,9 +506,38 @@ function toggleTCRows(show){
     if(r.value!=='יש לי הכנסות נוספות ממשכורת') r.checked=false;
   });
 }
-function setProgress(pct,label){
-  document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('progressLabel').textContent=label;
+// ===== PROGRESS =====
+var _currentPct = 0;
+var _targetPct  = 0;
+var _animFrame  = null;
+var _submitting = false;
+
+// חסימת יציאה מהדף בזמן שליחה
+window.addEventListener('beforeunload', function(e) {
+  if (_submitting) {
+    e.preventDefault();
+    e.returnValue = 'הטופס עדיין נשלח — אל תסגור את הדף!';
+    return e.returnValue;
+  }
+});
+
+function animateProgress() {
+  if (_currentPct < _targetPct) {
+    _currentPct = Math.min(_currentPct + 0.3, _targetPct);
+    var display = _currentPct.toFixed(1);
+    document.getElementById('progressFill').style.width = _currentPct + '%';
+    document.getElementById('progressPct').textContent  = display + '%';
+    _animFrame = requestAnimationFrame(animateProgress);
+  } else {
+    _animFrame = null;
+  }
+}
+
+function setProgress(pct, label, step) {
+  _targetPct = pct;
+  if (!_animFrame) _animFrame = requestAnimationFrame(animateProgress);
+  if (label) document.getElementById('progressLabel').textContent = label;
+  if (step)  document.getElementById('progressStep').textContent  = step;
 }
 function previewFile(inputId,previewId,labelId){
   var f=document.getElementById(inputId).files[0];
@@ -596,8 +632,11 @@ function submitForm(){
 
   var btn=document.getElementById('submitBtn');
   btn.disabled=true;btn.textContent='שולח...';
+  _submitting = true;
+  _currentPct = 0;
+  _targetPct  = 0;
   document.getElementById('progressWrap').style.display='block';
-  setProgress(5,'מכין נתונים...');
+  setProgress(3, 'מכין נתונים...', '⏳ אנא המתן, אל תסגור את הדף');
 
   var f101={
     taxYear:taxYear,status:vf('maritalStatus'),resident:radio('resident'),
@@ -635,21 +674,23 @@ function submitForm(){
   };
 
   // שלב 1 — שלח פרטי טופס (ללא קבצים, מהיר)
-  setProgress(15,'שולח פרטי טופס...');
+  setProgress(12, 'שולח פרטי טופס...', '📋 שולח נתונים לשרת...');
   apiCall('submitForm101',{
     token:_token||'',idNum:idNum,phone:phone,email:email,
     address:street+', '+city,birthDate:birthDate,gender:gender,
     lastName:lastName,firstName:firstName,form101:f101
   })
   .then(function(){
-    setProgress(50,'מעלה מסמכים ל-Drive...');
-    // שלב 2 — המר קבצים ושלח ל-Drive בנפרד
+    setProgress(42, 'טופס התקבל!', '✅ פרטי הטופס נשמרו — ממיר קבצים...');
     return Promise.all([fileToB64('tzFile'),fileToB64('toshavFile'),fileToB64('extraFile')]);
   })
   .then(function(files){
     var hasFiles=files.some(function(f){return f!==null;});
-    if(!hasFiles){setProgress(100,'הושלם! ✅');return Promise.resolve();}
-    setProgress(70,'מעלה קבצים...');
+    if(!hasFiles){
+      setProgress(100,'הושלם! ✅','✅ הכל נשלח בהצלחה!');
+      return Promise.resolve();
+    }
+    setProgress(60, 'מעלה קבצים ל-Drive...', '📤 מעלה מסמכים לתיקיית העובד...');
     return apiCall('uploadFilesToDrive',{
       token:_token||'',
       name:lastName+' '+firstName,
@@ -657,13 +698,14 @@ function submitForm(){
     });
   })
   .then(function(){
-    setProgress(100,'הושלם! ✅');
-    setTimeout(showSuccess,500);
+    setProgress(100,'הושלם! ✅','✅ כל הקבצים הועלו בהצלחה!');
+    _submitting = false;
+    setTimeout(showSuccess, 600);
   })
   .catch(function(){
-    // הטופס כבר נשלח — מציג הצלחה גם אם העלאת הקבצים נכשלה
-    setProgress(100,'הושלם!');
-    setTimeout(showSuccess,300);
+    setProgress(100,'הושלם!','✅ הטופס נשלח');
+    _submitting = false;
+    setTimeout(showSuccess, 400);
   });
 }
 
