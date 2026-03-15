@@ -26,10 +26,10 @@ def add_signature_to_pdf(pdf_path, sig_data_uri, output_path):
     # צור PDF שכבה עם החתימה
     packet = BytesIO()
     c = canvas.Canvas(packet, pagesize=(595.275, 841.89))
-    
+
     # קואורדינטות SIGN_SIG (עמוד 2, reportlab y מלמטה)
     sig_x, sig_y, sig_w, sig_h = 10.0, 171.9, 120.0, 35.0
-    
+
     # שמור תמונה זמנית
     img_buffer = BytesIO()
     img.save(img_buffer, format='PNG')
@@ -50,8 +50,9 @@ def add_signature_to_pdf(pdf_path, sig_data_uri, output_path):
 
     with open(output_path, 'wb') as f:
         writer.write(f)
-    
+
     return output_path
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_TEMPLATE = os.path.join(BASE_DIR, 'tofes-101.pdf')
@@ -160,16 +161,16 @@ def build_fields_json(data: dict) -> dict:
 
     # ו. בן/בת זוג
     spouse = data.get('spouse', {}) or {}
-    values['{{SPOUSE_ID}}']       = spouse.get('id', '')
-    values['{{SPOUSE_LAST}}']     = spouse.get('lastName', '')
-    values['{{SPOUSE_FIRST}}']    = spouse.get('firstName', '')
-    values['{{SPOUSE_BIRTH}}']    = fmt_date(spouse.get('birthDate', ''))
-    values['{{SPOUSE_ALIYA}}']    = fmt_date(spouse.get('aliyaDate', ''))
-    values['{{SPOUSE_PASSPORT}}'] = spouse.get('passport', '')
-    values['{{SPOUSE_NO_INCOME}}']     = 'X' if spouse.get('income') == 'NO' else ''
-    values['{{SPOUSE_HAS_INCOME}}']    = 'X' if spouse.get('income') == 'YES' else ''
-    values['{{SPOUSE_INCOME_WORK}}']   = 'X' if spouse.get('incomeType') == 'WORK' else ''
-    values['{{SPOUSE_INCOME_OTHER}}']  = 'X' if spouse.get('incomeType') == 'OTHER' else ''
+    values['{{SPOUSE_ID}}']           = spouse.get('id', '')
+    values['{{SPOUSE_LAST}}']         = spouse.get('lastName', '')
+    values['{{SPOUSE_FIRST}}']        = spouse.get('firstName', '')
+    values['{{SPOUSE_BIRTH}}']        = fmt_date(spouse.get('birthDate', ''))
+    values['{{SPOUSE_ALIYA}}']        = fmt_date(spouse.get('aliyaDate', ''))
+    values['{{SPOUSE_PASSPORT}}']     = spouse.get('passport', '')
+    values['{{SPOUSE_NO_INCOME}}']    = 'X' if spouse.get('income') == 'NO' else ''
+    values['{{SPOUSE_HAS_INCOME}}']   = 'X' if spouse.get('income') == 'YES' else ''
+    values['{{SPOUSE_INCOME_WORK}}']  = 'X' if spouse.get('incomeType') == 'WORK' else ''
+    values['{{SPOUSE_INCOME_OTHER}}'] = 'X' if spouse.get('incomeType') == 'OTHER' else ''
 
     # ז. שינויים
     changes = data.get('changes', [])
@@ -180,32 +181,35 @@ def build_fields_json(data: dict) -> dict:
         values[f'{{{{CHANGE{i}_SIG}}}}']     = ch.get('sig', '')
 
     # --- עמוד 2 ---
-    # מספר זהות בעמוד 2
-    values['{{ID_NUM}}'] = data.get('idNum', '')  # כבר מוגדר
+    values['{{ID_NUM}}'] = data.get('idNum', '')
 
     # ח. פטורים
     exemptions = data.get('exemptions', {}) or {}
     ex_map = {
-        'EX_RESIDENT': 'resident',
+        'EX_RESIDENT':   'resident',
         'EX_DISABLED_A': 'disabledA',
         'EX_DISABLED_B': 'disabledB',
-        'EX_YISHUV': 'yishuv',
-        'EX_OLEH': 'oleh',
-        'EX_SPOUSE': 'spouse',
+        'EX_YISHUV':     'yishuv',
+        'EX_OLEH':       'oleh',
+        'EX_SPOUSE':     'spouse',
         'EX_SINGLE_PAR': 'singlePar',
-        'EX_CHILD_7': 'child7',
-        'EX_CHILD_8': 'child8',
-        'EX_SOLO_PAR': 'soloPar',
-        'EX_CHILD_10': 'child10',
-        'EX_CHILD_11': 'child11',
-        'EX_ALIMONY': 'alimony',
-        'EX_AGE1618': 'age1618',
-        'EX_ARMY': 'army',
-        'EX_DEGREE': 'degree',
-        'EX_MILUIM': 'miluim',
+        'EX_CHILD_7':    'child7',
+        'EX_CHILD_8':    'child8',
+        'EX_SOLO_PAR':   'soloPar',
+        'EX_CHILD_10':   'child10',
+        'EX_CHILD_11':   'child11',
+        'EX_ALIMONY':    'alimony',
+        'EX_AGE1618':    'age1618',
+        'EX_ARMY':       'army',
+        'EX_DEGREE':     'degree',
+        'EX_MILUIM':     'miluim',
     }
     for ph_key, data_key in ex_map.items():
         values[f'{{{{{ph_key}}}}}'] = 'X' if exemptions.get(data_key) else ''
+
+    # ישוב מזכה — שם ותאריך
+    values['{{EX_YISHUV_NAME}}'] = exemptions.get('yishuvName', '')
+    values['{{EX_YISHUV_DATE}}'] = fmt_date(exemptions.get('yishuvDateFrom', ''))
 
     values['{{EX_OLEH_DATE}}']   = fmt_date(exemptions.get('olehDate', ''))
     values['{{EX_ARMY_START}}']  = fmt_date(exemptions.get('armyStart', ''))
@@ -238,7 +242,7 @@ def build_fields_json(data: dict) -> dict:
         if ph in values:
             field['entry_text']['text'] = values[ph]
         else:
-            field['entry_text']['text'] = ''  # ריק אם לא מוגדר
+            field['entry_text']['text'] = ''
 
     return fields
 
