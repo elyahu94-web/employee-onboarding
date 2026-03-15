@@ -542,6 +542,10 @@ function previewFile(inputId,previewId,labelId){
 // ===== CHILDREN =====
 var _childIdx=0;
 function addChild(){
+  if(document.querySelectorAll('[id^="cn_"]').length >= 13){
+    alert('עברת את מגבלת הטופס (13 ילדים).\nיש לצרף ספח תעודת זהות מעודכן הכולל את כל הילדים.');
+    return;
+  }
   _childIdx++;
   var i=_childIdx;
   var tr=document.createElement('tr'); tr.id='cr_'+i;
