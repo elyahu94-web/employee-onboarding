@@ -523,7 +523,7 @@ window.addEventListener('beforeunload', function(e) {
 
 function animateProgress() {
   if (_currentPct < _targetPct) {
-    _currentPct = Math.min(_currentPct + 0.3, _targetPct);
+    _currentPct = Math.min(_currentPct + 0.15, _targetPct);
     var display = _currentPct.toFixed(1);
     document.getElementById('progressFill').style.width = _currentPct + '%';
     document.getElementById('progressPct').textContent  = display + '%';
@@ -690,7 +690,7 @@ function submitForm(){
       setProgress(100,'הושלם! ✅','✅ הכל נשלח בהצלחה!');
       return Promise.resolve();
     }
-    setProgress(60, 'מעלה קבצים ל-Drive...', '📤 מעלה מסמכים לתיקיית העובד...');
+    setProgress(60, 'מעלה מסמכים...', '📤 מעלה מסמכים...');
     return apiCall('uploadFilesToDrive',{
       token:_token||'',
       name:lastName+' '+firstName,
@@ -698,14 +698,20 @@ function submitForm(){
     });
   })
   .then(function(){
-    setProgress(100,'הושלם! ✅','✅ כל הקבצים הועלו בהצלחה!');
-    _submitting = false;
-    setTimeout(showSuccess, 600);
+    setProgress(95,'מסיים...','✅ כמעט סיימנו...');
+    setTimeout(function(){
+      setProgress(100,'הושלם! ✅','✅ כל הקבצים הועלו בהצלחה!');
+      _submitting = false;
+      setTimeout(showSuccess, 800);
+    }, 1200);
   })
   .catch(function(){
-    setProgress(100,'הושלם!','✅ הטופס נשלח');
-    _submitting = false;
-    setTimeout(showSuccess, 400);
+    setProgress(95,'מסיים...','✅ הטופס נשלח');
+    setTimeout(function(){
+      setProgress(100,'הושלם!','✅ הטופס נשלח');
+      _submitting = false;
+      setTimeout(showSuccess, 600);
+    }, 1000);
   });
 }
 
