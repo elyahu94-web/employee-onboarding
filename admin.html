@@ -20,10 +20,10 @@
   label{display:block;font-size:.83rem;font-weight:600;color:var(--ink2);margin-bottom:6px;}
   input[type=text],input[type=password]{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:11px 14px;font-family:'Heebo',sans-serif;font-size:.93rem;outline:none;transition:border-color .2s;background:#fafaf8;}
   input:focus{border-color:var(--accent2);background:white;}
-  .btn{width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:13px;font-size:.95rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:14px;transition:background .2s;}
-  .btn:hover{background:var(--accent2);}
+  .btn{width:100%;background:var(--accent);color:white;border:none;border-radius:9px;padding:13px;font-size:.95rem;font-weight:700;font-family:'Heebo',sans-serif;cursor:pointer;margin-top:14px;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .btn:hover:not(:disabled){background:var(--accent2);}
   .btn:disabled{opacity:.6;cursor:not-allowed;}
-  .btn.gray{background:#888;margin-top:10px;}.btn.gray:hover{background:#666;}
+  .btn.gray{background:#888;margin-top:10px;}.btn.gray:hover:not(:disabled){background:#666;}
   .result-box{display:none;background:#edf7f1;border:1.5px solid #a8d5b8;border-radius:10px;padding:16px;margin-top:16px;}
   .result-name{font-weight:700;font-size:.95rem;margin-bottom:10px;color:var(--accent);}
   .link-row{display:flex;align-items:center;gap:8px;background:white;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
@@ -31,7 +31,8 @@
   .btn-copy{background:var(--accent);color:white;border:none;border-radius:6px;padding:6px 12px;font-size:.78rem;font-family:'Heebo',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;}
   .btn-copy:hover{background:var(--accent2);}
   .btn-wa{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;background:#25d366;color:white;border:none;border-radius:8px;padding:10px;font-size:.9rem;font-weight:600;font-family:'Heebo',sans-serif;cursor:pointer;text-decoration:none;}
-  .link-item{padding:12px 14px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:white;}
+  .link-item{padding:12px 14px;border:1px solid var(--border);border-radius:9px;margin-bottom:8px;background:white;transition:opacity .2s;}
+  .link-item.loading-item{opacity:.5;pointer-events:none;}
   .link-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
   .link-item-name{font-weight:700;font-size:.92rem;}
   .link-item-date{font-size:.73rem;color:var(--ink3);margin-bottom:6px;}
@@ -42,6 +43,20 @@
   #loginWrap{max-width:360px;margin:80px auto;padding:0 20px;}
   .err{color:var(--red);font-size:.82rem;margin-top:8px;display:none;}
   .err-box{background:#fdecea;border:1.5px solid #f5c6cb;border-radius:8px;padding:12px;margin-top:12px;font-size:.85rem;color:var(--red);display:none;}
+
+  /* ===== SPINNER ===== */
+  .spinner{width:18px;height:18px;border:2.5px solid rgba(255,255,255,.35);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+  .spinner.dark{border-color:rgba(0,0,0,.15);border-top-color:var(--accent);}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* overlay רשימה */
+  .list-loading{display:none;align-items:center;justify-content:center;gap:10px;padding:20px;color:var(--ink3);font-size:.88rem;}
+  .list-loading .spinner{border-top-color:var(--accent);}
+
+  /* מחיקת כל שמולאו */
+  .btn-delete-icon{background:none;border:none;cursor:pointer;font-size:16px;opacity:.5;padding:2px 6px;transition:opacity .15s;}
+  .btn-delete-icon:hover{opacity:1;}
+  .btn-delete-icon.spinning{pointer-events:none;opacity:.4;}
 </style>
 </head>
 <body>
@@ -62,6 +77,8 @@
 
 <div id="mainWrap" style="display:none">
 <div class="container">
+
+  <!-- יצירת קישור -->
   <div class="card">
     <div class="card-title">🔗 יצירת קישור חד-פעמי</div>
     <label>שם העובד</label>
@@ -77,11 +94,22 @@
       <a class="btn-wa" id="waBtn" href="#" target="_blank">📲 שלח ב-WhatsApp</a>
     </div>
   </div>
+
+  <!-- רשימת קישורים -->
   <div class="card">
     <div class="card-title">📋 קישורים שנשלחו</div>
-    <div id="linksList"><div class="empty-list">טוען...</div></div>
-    <button class="btn gray" onclick="clearDone()">🗑 מחק מולאו</button>
+
+    <!-- spinner טעינה ראשית -->
+    <div class="list-loading" id="listLoading">
+      <div class="spinner dark"></div>
+      <span>טוען...</span>
+    </div>
+
+    <div id="linksList"></div>
+
+    <button class="btn gray" id="clearDoneBtn" onclick="clearDone()">🗑 מחק מולאו</button>
   </div>
+
 </div>
 </div>
 
@@ -90,6 +118,7 @@ var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ
 var FORM_BASE  = "https://elyahu94-web.github.io/employee-onboarding/";
 var ADMIN_PASS = "orsid2026";
 
+// ===== LOGIN =====
 function login(){
   if(document.getElementById('pwInput').value===ADMIN_PASS){
     document.getElementById('loginWrap').style.display='none';
@@ -100,6 +129,7 @@ function login(){
   }
 }
 
+// ===== API =====
 function makeToken(){
   var c='abcdefghijklmnopqrstuvwxyz0123456789',t='';
   for(var i=0;i<24;i++) t+=c[Math.floor(Math.random()*c.length)];
@@ -118,101 +148,161 @@ function api(action, payload){
   });
 }
 
+// ===== LOADING HELPERS =====
+function setBtn(id, loading, defaultText){
+  var btn = document.getElementById(id);
+  if(!btn) return;
+  if(loading){
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>' + (defaultText ? '<span>' + defaultText + '</span>' : '');
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = defaultText || '';
+  }
+}
+
+function setListLoading(show){
+  document.getElementById('listLoading').style.display = show ? 'flex' : 'none';
+  document.getElementById('linksList').style.opacity  = show ? '0.3' : '1';
+}
+
+// ===== יצירת קישור =====
 function generateLink(){
-  var name=document.getElementById('workerName').value.trim();
-  if(!name){alert('הזן שם עובד');return;}
-  var btn=document.getElementById('genBtn');
-  var errBox=document.getElementById('genErr');
-  btn.textContent='יוצר קישור...';
-  btn.disabled=true;
-  errBox.style.display='none';
-  document.getElementById('resultBox').style.display='none';
+  var name = document.getElementById('workerName').value.trim();
+  if(!name){ alert('הזן שם עובד'); return; }
 
-  var token=makeToken();
+  var errBox = document.getElementById('genErr');
+  errBox.style.display = 'none';
+  document.getElementById('resultBox').style.display = 'none';
 
-  api('generateFormToken',{workerName:name, token:token})
+  setBtn('genBtn', true, 'יוצר קישור...');
+
+  var token = makeToken();
+
+  api('generateFormToken', {workerName:name, token:token})
   .then(function(){
-    var link=FORM_BASE+'?token='+token;
-    document.getElementById('resultName').textContent='✅ קישור נוצר עבור: '+name;
-    document.getElementById('resultLink').textContent=link;
-    document.getElementById('resultBox').style.display='block';
-    document.getElementById('waBtn').href='https://wa.me/?text='+
-      encodeURIComponent('שלום '+name+',\nאנא מלא את טופס פרטי העובד:\n'+link);
-    document.getElementById('workerName').value='';
+    var link = FORM_BASE + '?token=' + token;
+    document.getElementById('resultName').textContent = '✅ קישור נוצר עבור: ' + name;
+    document.getElementById('resultLink').textContent = link;
+    document.getElementById('resultBox').style.display = 'block';
+    document.getElementById('waBtn').href = 'https://wa.me/?text=' +
+      encodeURIComponent('שלום ' + name + ',\nאנא מלא את טופס פרטי העובד:\n' + link);
+    document.getElementById('workerName').value = '';
     loadList();
   })
   .catch(function(err){
-    errBox.textContent='שגיאה: לא ניתן ליצור קישור — '+err.message;
-    errBox.style.display='block';
+    errBox.textContent = 'שגיאה: לא ניתן ליצור קישור — ' + err.message;
+    errBox.style.display = 'block';
   })
   .finally(function(){
-    btn.textContent='צור קישור';
-    btn.disabled=false;
+    setBtn('genBtn', false, 'צור קישור');
   });
 }
 
+// ===== העתק =====
 function copyLink(){
-  var link=document.getElementById('resultLink').textContent;
+  var link = document.getElementById('resultLink').textContent;
   navigator.clipboard.writeText(link).then(function(){
-    var b=document.getElementById('copyBtn');
-    b.textContent='✅ הועתק';
-    setTimeout(function(){b.textContent='העתק';},2000);
+    var b = document.getElementById('copyBtn');
+    b.textContent = '✅ הועתק';
+    setTimeout(function(){ b.textContent = 'העתק'; }, 2000);
   });
 }
 
 function copyTokenLink(token){
-  navigator.clipboard.writeText(FORM_BASE+'?token='+token)
-    .then(function(){alert('הועתק ✅');});
+  navigator.clipboard.writeText(FORM_BASE + '?token=' + token)
+    .then(function(){ alert('הועתק ✅'); });
 }
 
+// ===== טעינת רשימה =====
 function loadList(){
-  api('getFormTokens',{})
+  setListLoading(true);
+  api('getFormTokens', {})
   .then(function(list){
-    renderList(list||[]);
+    renderList(list || []);
   })
   .catch(function(){
-    document.getElementById('linksList').innerHTML='<div class="empty-list">שגיאה בטעינה</div>';
+    document.getElementById('linksList').innerHTML = '<div class="empty-list">שגיאה בטעינה</div>';
+  })
+  .finally(function(){
+    setListLoading(false);
   });
 }
 
+// ===== מחיקת קישור בודד =====
 function deleteLink(token){
   if(!confirm('למחוק קישור זה לצמיתות?')) return;
-  api('deleteFormToken',{token:token})
-  .then(function(){ loadList(); })
-  .catch(function(){ alert('שגיאה במחיקה'); });
-}
 
-function clearDone(){
-  if(!confirm('למחוק את כל הקישורים שמולאו?')) return;
-  api('getFormTokens',{}).then(function(list){
-    var done=(list||[]).filter(function(i){return i.used;});
-    var promises=done.map(function(i){ return api('deleteFormToken',{token:i.token}); });
-    Promise.all(promises).then(function(){ loadList(); });
+  // מצא את הפריט ברשימה והצג spinner
+  var row = document.getElementById('row_' + token);
+  if(row){
+    row.classList.add('loading-item');
+    var delBtn = row.querySelector('.btn-delete-icon');
+    if(delBtn) delBtn.innerHTML = '<div class="spinner dark" style="width:14px;height:14px"></div>';
+  }
+
+  api('deleteFormToken', {token:token})
+  .then(function(){ loadList(); })
+  .catch(function(){
+    alert('שגיאה במחיקה');
+    if(row) row.classList.remove('loading-item');
   });
 }
 
+// ===== מחיקת כל שמולאו =====
+function clearDone(){
+  if(!confirm('למחוק את כל הקישורים שמולאו?')) return;
+
+  setBtn('clearDoneBtn', true, 'מוחק...');
+
+  api('getFormTokens', {}).then(function(list){
+    var done = (list || []).filter(function(i){ return i.used; });
+    if(!done.length){
+      setBtn('clearDoneBtn', false, '🗑 מחק מולאו');
+      return;
+    }
+    var promises = done.map(function(i){ return api('deleteFormToken', {token:i.token}); });
+    Promise.all(promises)
+    .then(function(){ loadList(); })
+    .finally(function(){
+      setBtn('clearDoneBtn', false, '🗑 מחק מולאו');
+    });
+  })
+  .catch(function(){
+    setBtn('clearDoneBtn', false, '🗑 מחק מולאו');
+  });
+}
+
+// ===== רינדור רשימה =====
 function renderList(list){
-  var el=document.getElementById('linksList');
-  if(!list.length){el.innerHTML='<div class="empty-list">אין קישורים עדיין</div>';return;}
-  el.innerHTML='';
+  var el = document.getElementById('linksList');
+  if(!list.length){
+    el.innerHTML = '<div class="empty-list">אין קישורים עדיין</div>';
+    return;
+  }
+  el.innerHTML = '';
   list.forEach(function(item){
-    var link=FORM_BASE+'?token='+item.token;
-    var badge=item.used
-      ?'<span class="badge badge-done">✅ מולא'+(item.time?' · '+item.time:'')+'</span>'
-      :'<span class="badge badge-pending">⏳ ממתין</span>';
-    var d=document.createElement('div');
-    d.className='link-item';
-    d.innerHTML='<div class="link-item-top">'
-      +'<span class="link-item-name">'+item.name+'</span>'+badge
-      +'<button onclick="deleteLink(\''+item.token+'\')" style="margin-right:auto;background:none;border:none;cursor:pointer;font-size:16px;opacity:0.5;padding:2px 6px" title="מחק">🗑</button>'
-      +'</div>'
-      +'<div class="link-item-date">'+item.date+'</div>'
-      +(!item.used
-        ?'<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
-          +'<span class="lnk" style="flex:1">'+link+'</span>'
-          +'<button class="btn-copy" onclick="copyTokenLink(\''+item.token+'\')">העתק</button>'
-          +'</div>'
-        :'');
+    var link = FORM_BASE + '?token=' + item.token;
+    var badge = item.used
+      ? '<span class="badge badge-done">✅ מולא' + (item.time ? ' · ' + item.time : '') + '</span>'
+      : '<span class="badge badge-pending">⏳ ממתין</span>';
+
+    var d = document.createElement('div');
+    d.className = 'link-item';
+    d.id = 'row_' + item.token;
+    d.innerHTML =
+      '<div class="link-item-top">'
+        + '<span class="link-item-name">' + item.name + '</span>'
+        + badge
+        + '<button class="btn-delete-icon" onclick="deleteLink(\'' + item.token + '\')" title="מחק">🗑</button>'
+      + '</div>'
+      + '<div class="link-item-date">' + item.date + '</div>'
+      + (!item.used
+          ? '<div style="display:flex;align-items:center;gap:6px;margin-top:4px">'
+              + '<span class="lnk" style="flex:1">' + link + '</span>'
+              + '<button class="btn-copy" onclick="copyTokenLink(\'' + item.token + '\')">העתק</button>'
+            + '</div>'
+          : '');
     el.appendChild(d);
   });
 }
