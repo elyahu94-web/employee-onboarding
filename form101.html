@@ -279,7 +279,12 @@
             <label style="display:flex;align-items:center;gap:10px;font-size:.86rem;padding:6px 10px"><input type="checkbox" id="ex2b"> <span><strong>2ב.</strong> מקבל/ת תגמול חודשי לפי חוק הנכים</span></label>
           </div>
           <label><input type="checkbox" id="ex3" onchange="showSub('sub3',this.checked)"> <span><strong>3.</strong> תושב/ת ישוב מזכה (סעיף 11)</span></label>
-          <div id="sub3" style="display:none"></div>
+          <div id="sub3" class="indent" style="display:none">
+            <div class="row" style="margin-top:6px">
+              <div class="field"><label>מתאריך</label><input type="date" id="ex3_date"></div>
+              <div class="field"><label>שם הישוב</label><input type="text" id="ex3_yishuv" placeholder="שם הישוב המזכה"></div>
+            </div>
+          </div>
           <label><input type="checkbox" id="ex4"> <span><strong>4.</strong> עולה חדש/ה</span></label>
           <label><input type="checkbox" id="ex5"> <span><strong>5.</strong> בן/בת זוג ללא הכנסות</span></label>
           <label><input type="checkbox" id="ex6"> <span><strong>6.</strong> הורה חד-הורי</span></label>
@@ -653,7 +658,7 @@ function submitForm(){
       monthly:vf('oi_monthly'),tax:vf('oi_tax')}:null,
     exemptions:{
       resident:chk('ex1'),disabled:chk('ex2a'),disabledBenefit:chk('ex2b'),
-      yishuv:chk('ex3'),oleh:chk('ex4'),spouseNokids:chk('ex5'),singleParent:chk('ex6'),
+      yishuv:chk('ex3'),yishuvDate:vf('ex3_date'),yishuvName:vf('ex3_yishuv'),oleh:chk('ex4'),spouseNokids:chk('ex5'),singleParent:chk('ex6'),
       childCustody:chk('ex7'),childNonCustody:chk('ex8'),soloParent:chk('ex9'),
       alimonyPay:chk('ex10'),disabledChild:chk('ex11'),disabledChildNum:vf('ex11_num'),
       alimony:chk('ex12'),age1618:chk('ex13'),
