@@ -1484,48 +1484,6 @@
     },
     {
       "page_number": 2,
-      "description": "EX_YISHUV",
-      "field_label": "EX_YISHUV",
-      "label_bounding_box": [
-        523.6023514851485,
-        96.396405,
-        543.6023514851485,
-        107.34097499999999
-      ],
-      "entry_bounding_box": [
-        510.65670084865627,
-        96.396405,
-        521.6023514851485,
-        107.34097499999999
-      ],
-      "entry_text": {
-        "text": "{{EX_YISHUV}}",
-        "font_size": 10
-      }
-    },
-    {
-      "page_number": 2,
-      "description": "EX_YISHUV_DATE",
-      "field_label": "EX_YISHUV_DATE",
-      "label_bounding_box": [
-        332.8954384724186,
-        94.29168,
-        352.8954384724186,
-        107.76192
-      ],
-      "entry_bounding_box": [
-        254.27588401697312,
-        94.29168,
-        330.8954384724186,
-        107.76192
-      ],
-      "entry_text": {
-        "text": "{{EX_YISHUV_DATE}}",
-        "font_size": 10
-      }
-    },
-    {
-      "page_number": 2,
       "description": "EX_OLEH",
       "field_label": "EX_OLEH",
       "label_bounding_box": [
@@ -3706,6 +3664,69 @@
       "entry_text": {
         "text": "{{CHILD13_KITZBA}}",
         "font_size": 8
+      }
+    },
+    {
+      "page_number": 2,
+      "description": "EX_YISHUV",
+      "field_label": "EX_YISHUV",
+      "label_bounding_box": [
+        520.35,
+        96.18,
+        525.35,
+        104.89
+      ],
+      "entry_bounding_box": [
+        510.18,
+        96.18,
+        520.35,
+        104.89
+      ],
+      "entry_text": {
+        "text": "{{EX_YISHUV}}",
+        "font_size": 9
+      }
+    },
+    {
+      "page_number": 2,
+      "description": "EX_YISHUV_NAME",
+      "field_label": "EX_YISHUV_NAME",
+      "label_bounding_box": [
+        436.14,
+        108.53,
+        441.14,
+        117.97
+      ],
+      "entry_bounding_box": [
+        296.76,
+        108.53,
+        436.14,
+        117.97
+      ],
+      "entry_text": {
+        "text": "{{EX_YISHUV_NAME}}",
+        "font_size": 9
+      }
+    },
+    {
+      "page_number": 2,
+      "description": "EX_YISHUV_DATE",
+      "field_label": "EX_YISHUV_DATE",
+      "label_bounding_box": [
+        330.24,
+        93.82,
+        335.24,
+        106.17
+      ],
+      "entry_bounding_box": [
+        248.94,
+        93.82,
+        330.24,
+        106.17
+      ],
+      "entry_text": {
+        "text": "{{EX_YISHUV_DATE}}",
+        "font_size": 9
       }
     }
   ]
