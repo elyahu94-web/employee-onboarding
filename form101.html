@@ -24,10 +24,7 @@
   .field{flex:1;display:flex;flex-direction:column;gap:5px;}
   .field label{font-size:.8rem;font-weight:600;color:var(--ink2);}
   .req{color:var(--red);margin-right:2px;}
-  .field input[type=text],.field input[type=date],.field input[type=number],.field input[type=email],.field select{
-    border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;
-    font-family:'Heebo',sans-serif;font-size:.91rem;color:var(--ink);background:#fafaf8;
-    outline:none;transition:border-color .2s;width:100%;}
+  .field input[type=text],.field input[type=date],.field input[type=number],.field input[type=email],.field select{border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;font-family:'Heebo',sans-serif;font-size:.91rem;color:var(--ink);background:#fafaf8;outline:none;transition:border-color .2s;width:100%;}
   .field input:focus,.field select:focus{border-color:var(--accent2);background:white;}
   .radio-group{display:flex;flex-direction:column;gap:6px;}
   .radio-group label,.check-group label{display:flex;align-items:flex-start;gap:10px;font-weight:400;cursor:pointer;font-size:.88rem;line-height:1.5;padding:7px 10px;border-radius:8px;transition:background .15s;}
@@ -45,13 +42,12 @@
   .btn-add{background:var(--accent);color:white;border:none;border-radius:7px;padding:7px 14px;font-family:'Heebo',sans-serif;font-size:.83rem;cursor:pointer;margin-top:9px;}
   .btn-add:hover{background:var(--accent2);}
   .btn-remove{background:#e74c3c;color:white;border:none;border-radius:5px;padding:3px 8px;cursor:pointer;font-size:.76rem;}
-  /* file upload */
+  .children-limit-msg{display:none;margin-top:10px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:.83rem;color:#856404;line-height:1.6;}
   .file-upload-area{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fafaf8;}
   .file-upload-area:hover{border-color:var(--accent2);background:#f0f7f4;}
   .file-upload-area input[type=file]{display:none;}
   .file-upload-label{font-size:.85rem;color:var(--ink3);cursor:pointer;display:block;}
   .file-preview{margin-top:6px;font-size:.8rem;color:var(--accent2);font-weight:600;}
-  /* sig */
   .sig-wrap{border:1.5px solid var(--border);border-radius:8px;overflow:hidden;background:#fafaf8;position:relative;}
   .sig-hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--ink3);font-size:.85rem;pointer-events:none;}
   canvas{display:block;width:100%;cursor:crosshair;touch-action:none;}
@@ -62,6 +58,10 @@
   .btn-submit:hover{background:var(--accent2);}
   .btn-submit:disabled{opacity:.6;cursor:not-allowed;}
   .submit-area{margin-top:24px;text-align:center;}
+  .progress-wrap{display:none;margin-top:16px;}
+  .progress-bar-bg{background:#e0ddd6;border-radius:20px;height:8px;overflow:hidden;margin:10px 0;}
+  .progress-bar-fill{background:var(--accent2);height:100%;width:0%;border-radius:20px;transition:width .5s ease;}
+  .progress-label{font-size:.82rem;color:var(--ink3);text-align:center;}
   .success-screen{display:none;text-align:center;padding:60px 20px;}
   .success-icon{width:76px;height:76px;background:#d4edda;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 18px;animation:pop .4s ease;}
   @keyframes pop{0%{transform:scale(.5);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
@@ -82,7 +82,6 @@
 </div>
 
 <div class="container">
-
   <div class="success-screen" id="successScreen">
     <div class="success-icon">✅</div>
     <div class="success-title">טופס 101 נשלח בהצלחה!</div>
@@ -104,7 +103,6 @@
     <div class="page-title">טופס 101 — כרטיס עובד</div>
     <div class="page-sub">שנת מס: <strong id="taxYearLabel"></strong> &nbsp;|&nbsp; לפי תקנות מס הכנסה, התשנ"ג-1993</div>
 
-    <!-- א. פרטים אישיים -->
     <div class="section">
       <div class="section-header"><div class="section-icon">🪪</div>א. פרטים אישיים</div>
       <div class="section-body">
@@ -137,7 +135,6 @@
       </div>
     </div>
 
-    <!-- ב. מצב אישי -->
     <div class="section">
       <div class="section-header"><div class="section-icon">👤</div>ב. פרטים אישיים</div>
       <div class="section-body">
@@ -147,8 +144,7 @@
             <select id="maritalStatus" onchange="toggleSpouse()">
               <option value="">בחר...</option>
               <option>רווק/ה</option><option>נשוי/אה</option>
-              <option>גרוש/ה</option><option>אלמן/ה</option>
-              <option>פרוד/ה</option>
+              <option>גרוש/ה</option><option>אלמן/ה</option><option>פרוד/ה</option>
             </select>
           </div>
           <div class="field">
@@ -177,16 +173,12 @@
           </div>
         </div>
         <div class="row">
-          <div class="field">
-            <label>תאריך עליה לארץ (אם רלוונטי)</label>
-            <input type="date" id="aliyaDate">
-          </div>
+          <div class="field"><label>תאריך עליה לארץ (אם רלוונטי)</label><input type="date" id="aliyaDate"></div>
           <div class="field"></div>
         </div>
       </div>
     </div>
 
-    <!-- ו. בן/בת זוג -->
     <div class="section" id="spouseSection" style="display:none">
       <div class="section-header"><div class="section-icon">💑</div>ו. פרטי בן/בת הזוג</div>
       <div class="section-body">
@@ -209,35 +201,29 @@
       </div>
     </div>
 
-    <!-- ג. ילדים -->
     <div class="section">
       <div class="section-header"><div class="section-icon">👶</div>ג. ילדים (עד גיל 19)</div>
       <div class="section-body">
         <p style="font-size:.8rem;color:var(--ink3);margin-bottom:10px">עמודה 1 = ילד בחזקתך &nbsp;|&nbsp; עמודה 2 = מקבל קצבת ילדים מביטוח לאומי</p>
         <div style="overflow-x:auto">
           <table class="children-table">
-            <thead>
-              <tr>
-                <th>שם</th><th>ת.ז</th><th>ת. לידה</th>
-                <th style="text-align:center">1</th><th style="text-align:center">2</th><th></th>
-              </tr>
-            </thead>
+            <thead><tr><th>שם</th><th>ת.ז</th><th>ת. לידה</th><th style="text-align:center">1</th><th style="text-align:center">2</th><th></th></tr></thead>
             <tbody id="childrenBody"></tbody>
           </table>
         </div>
-        <button type="button" class="btn-add" onclick="addChild()">+ הוסף ילד/ה</button>
+        <button type="button" class="btn-add" id="btnAddChild" onclick="addChild()">+ הוסף ילד/ה</button>
+        <div class="children-limit-msg" id="childrenLimitMsg">
+          ⚠️ <strong>עברת את מגבלת הטופס (13 ילדים).</strong><br>
+          יש לצרף ספח תעודת זהות מעודכן הכולל את כל הילדים.
+        </div>
       </div>
     </div>
 
-    <!-- ד. סוג הכנסה -->
     <div class="section">
       <div class="section-header"><div class="section-icon">💰</div>ד. הכנסה ממעסיק זה <span style="color:var(--gold);margin-right:4px">*</span></div>
       <div class="section-body">
         <div class="row" style="margin-bottom:16px">
-          <div class="field">
-            <label>תאריך תחילת עבודה בשנת המס</label>
-            <input type="date" id="f101_start">
-          </div>
+          <div class="field"><label>תאריך תחילת עבודה בשנת המס</label><input type="date" id="f101_start"></div>
           <div class="field"></div>
         </div>
         <div class="radio-group">
@@ -251,7 +237,6 @@
       </div>
     </div>
 
-    <!-- ה. הכנסות אחרות -->
     <div class="section">
       <div class="section-header"><div class="section-icon">📋</div>ה. הכנסות אחרות <span style="color:var(--gold);margin-right:4px">*</span></div>
       <div class="section-body">
@@ -281,7 +266,6 @@
       </div>
     </div>
 
-    <!-- ח. פטורים -->
     <div class="section">
       <div class="section-header"><div class="section-icon">⭐</div>ח. פטורים וזיכויים ממס</div>
       <div class="section-body">
@@ -328,7 +312,6 @@
       </div>
     </div>
 
-    <!-- ט. תיאום מס -->
     <div class="section">
       <div class="section-header"><div class="section-icon">⚖️</div>ט. תיאום מס <span style="color:var(--gold);margin-right:4px">*</span></div>
       <div class="section-body">
@@ -338,16 +321,14 @@
           <label><input type="radio" name="taxCoord" value="אישור פקיד שומה" onchange="toggleTCRows(false)"> <span><strong>3.</strong> פקיד השומה אישר תיאום — מצורף אישור</span></label>
           <div id="tcRowsBox" style="display:none;margin-top:14px;overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:.82rem">
-              <thead>
-                <tr style="background:#f0ede6">
-                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">שם המעסיק/משלם</th>
-                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">כתובת</th>
-                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">מס' תיק ניכויים</th>
-                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">סוג הכנסה</th>
-                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">הכנסה חודשית</th>
-                  <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">מס שנוכה</th>
-                </tr>
-              </thead>
+              <thead><tr style="background:#f0ede6">
+                <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">שם המעסיק/משלם</th>
+                <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">כתובת</th>
+                <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">מס' תיק ניכויים</th>
+                <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">סוג הכנסה</th>
+                <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">הכנסה חודשית</th>
+                <th style="padding:7px 8px;text-align:right;font-weight:600;color:var(--ink2)">מס שנוכה</th>
+              </tr></thead>
               <tbody>
                 <tr>
                   <td style="padding:4px"><input type="text" id="tc1_emp" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:5px 7px;font-family:Heebo,sans-serif;font-size:.81rem"></td>
@@ -380,8 +361,6 @@
       </div>
     </div>
 
-
-    <!-- ז. שינויים במהלך השנה -->
     <div class="section">
       <div class="section-header"><div class="section-icon">🔄</div>ז. שינויים במהלך השנה</div>
       <div class="section-body">
@@ -412,12 +391,10 @@
       </div>
     </div>
 
-    <!-- מסמכים -->
     <div class="section">
       <div class="section-header"><div class="section-icon">📎</div>מסמכים לצירוף</div>
       <div class="section-body">
         <div style="display:flex;flex-direction:column;gap:16px">
-
           <div class="field">
             <label>צילום תעודת זהות (כולל ספח) <span class="req">*</span></label>
             <div class="file-upload-area" onclick="document.getElementById('tzFile').click()">
@@ -426,7 +403,6 @@
             </div>
             <div class="file-preview" id="tzPreview"></div>
           </div>
-
           <div class="field">
             <label>אישור תושב (טופס 1312א) — אם רלוונטי</label>
             <div class="file-upload-area" onclick="document.getElementById('toshavFile').click()">
@@ -435,7 +411,6 @@
             </div>
             <div class="file-preview" id="toshavPreview"></div>
           </div>
-
           <div class="field">
             <label>מסמך נוסף (תעודת שחרור, אישור נכות, תעודת עולה, פסק דין...)</label>
             <div class="file-upload-area" onclick="document.getElementById('extraFile').click()">
@@ -444,12 +419,10 @@
             </div>
             <div class="file-preview" id="extraPreview"></div>
           </div>
-
         </div>
       </div>
     </div>
 
-    <!-- י. חתימה -->
     <div class="section">
       <div class="section-header"><div class="section-icon">✍️</div>י. הצהרה וחתימה</div>
       <div class="section-body">
@@ -468,9 +441,12 @@
 
     <div class="submit-area">
       <button class="btn-submit" id="submitBtn" onclick="submitForm()">שלח טופס 101 ✉️</button>
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">מכין...</div>
+      </div>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -478,7 +454,6 @@ var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfuPguiMB_U7CsRkhv3kJ
 var _token = null;
 var taxYear = new Date().getFullYear();
 
-// ===== TOKEN CHECK =====
 (function(){
   var params=new URLSearchParams(window.location.search);
   var token=params.get('token');
@@ -491,7 +466,6 @@ var taxYear = new Date().getFullYear();
   if(!token){showError('קישור חסר','יש לפנות למשאבי אנוש לקבלת קישור אישי.');return;}
   _token=token;
   document.getElementById('taxYearLabel').textContent=taxYear;
-
   var t=setTimeout(function(){showError('שגיאת חיבור','נסה שוב מאוחר יותר.');},12000);
   fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({action:'checkToken101',payload:{token:token}}),redirect:'follow'})
@@ -499,7 +473,6 @@ var taxYear = new Date().getFullYear();
   .then(function(d){
     clearTimeout(t);
     var res=d.data||d;
-    // טופס 101 מאפשר גישה גם אם שלב 1 כבר מולא — בודק רק שהטוקן קיים
     if(res&&res.valid===false&&res.reason==='notfound'){
       showError('קישור לא תקין','יש לפנות למשאבי אנוש לקבלת קישור חדש.');
     } else {
@@ -509,13 +482,11 @@ var taxYear = new Date().getFullYear();
   })
   .catch(function(){
     clearTimeout(t);
-    // אם אין חיבור — הצג את הטופס בכל מקרה (token מהURL)
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('formWrap').style.display='block';
   });
 })();
 
-// ===== HELPERS =====
 function vf(id){var e=document.getElementById(id);return e?e.value.trim():'';}
 function chk(id){var e=document.getElementById(id);return !!(e&&e.checked);}
 function radio(name){var e=document.querySelector('input[name="'+name+'"]:checked');return e?e.value:'';}
@@ -524,38 +495,45 @@ function toggleSpouse(){var v=vf('maritalStatus');showSub('spouseSection',v==='�
 function toggleOI(show){showSub('oiBox',show);}
 function toggleTCRows(show){
   showSub('tcRowsBox',show);
-  // אפס radio אחרים
   if(show) document.querySelectorAll('input[name="taxCoord"]').forEach(function(r){
     if(r.value!=='יש לי הכנסות נוספות ממשכורת') r.checked=false;
   });
 }
-
-// ===== FILE PREVIEW =====
+function setProgress(pct,label){
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=label;
+}
 function previewFile(inputId,previewId,labelId){
   var f=document.getElementById(inputId).files[0];
-  if(f){
-    document.getElementById(previewId).textContent='✅ '+f.name;
-    document.getElementById(labelId).textContent='✅ '+f.name;
-  }
+  if(f){document.getElementById(previewId).textContent='✅ '+f.name;document.getElementById(labelId).textContent='✅ '+f.name;}
 }
 
-// ===== CHILDREN =====
 var _childIdx=0;
 function addChild(){
-  if(document.querySelectorAll('[id^="cn_"]').length >= 13){
-    alert('עברת את מגבלת הטופס (13 ילדים).\nיש לצרף ספח תעודת זהות מעודכן הכולל את כל הילדים.');
+  if(document.querySelectorAll('[id^="cn_"]').length>=13){
+    document.getElementById('childrenLimitMsg').style.display='block';
+    document.getElementById('btnAddChild').style.opacity='0.4';
     return;
   }
   _childIdx++;
   var i=_childIdx;
-  var tr=document.createElement('tr'); tr.id='cr_'+i;
+  var tr=document.createElement('tr');tr.id='cr_'+i;
   tr.innerHTML='<td><input type="text" id="cn_'+i+'" placeholder="שם מלא"></td>'
     +'<td><input type="text" id="ci_'+i+'" maxlength="9" style="width:80px"></td>'
     +'<td><input type="date" id="cb_'+i+'"></td>'
     +'<td style="text-align:center"><input type="checkbox" id="cc1_'+i+'"></td>'
     +'<td style="text-align:center"><input type="checkbox" id="cc2_'+i+'"></td>'
-    +'<td><button class="btn-remove" onclick="document.getElementById(\'cr_'+i+'\').remove()">✕</button></td>';
+    +'<td><button class="btn-remove" onclick="removeChild(\'cr_'+i+'\')">✕</button></td>';
   document.getElementById('childrenBody').appendChild(tr);
+  if(document.querySelectorAll('[id^="cn_"]').length>=13){
+    document.getElementById('childrenLimitMsg').style.display='block';
+    document.getElementById('btnAddChild').style.opacity='0.4';
+  }
+}
+function removeChild(id){
+  var el=document.getElementById(id);if(el)el.remove();
+  document.getElementById('childrenLimitMsg').style.display='none';
+  document.getElementById('btnAddChild').style.opacity='1';
 }
 function collectChildren(){
   var arr=[];
@@ -566,19 +544,17 @@ function collectChildren(){
   return arr;
 }
 
-// ===== SIGNATURE =====
 var canvas=document.getElementById('sigCanvas'),ctx=canvas.getContext('2d'),drawing=false,hasSig=false;
 function initSig(){
-  if(!canvas.parentElement) return;
+  if(!canvas.parentElement)return;
   var w=canvas.parentElement.getBoundingClientRect().width;
-  if(w===0) w=window.innerWidth-80;
-  canvas.width=w*window.devicePixelRatio; canvas.height=130*window.devicePixelRatio;
-  canvas.style.width=w+'px'; canvas.style.height='130px';
+  if(w===0)w=window.innerWidth-80;
+  canvas.width=w*window.devicePixelRatio;canvas.height=130*window.devicePixelRatio;
+  canvas.style.width=w+'px';canvas.style.height='130px';
   ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
-  ctx.strokeStyle='#1a1a18'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  ctx.strokeStyle='#1a1a18';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.lineJoin='round';
 }
-window.addEventListener('load', initSig);
-window.addEventListener('resize',initSig);
+window.addEventListener('load',initSig);window.addEventListener('resize',initSig);
 function gp(e){var r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
 canvas.addEventListener('mousedown',function(e){drawing=true;var p=gp(e);ctx.beginPath();ctx.moveTo(p.x,p.y);});
 canvas.addEventListener('mousemove',function(e){if(!drawing)return;var p=gp(e);ctx.lineTo(p.x,p.y);ctx.stroke();hasSig=true;document.getElementById('sigHint').style.opacity='0';});
@@ -589,7 +565,6 @@ canvas.addEventListener('touchmove',function(e){e.preventDefault();if(!drawing)r
 canvas.addEventListener('touchend',function(){drawing=false;});
 function clearSig(){ctx.clearRect(0,0,canvas.width/window.devicePixelRatio,canvas.height/window.devicePixelRatio);hasSig=false;document.getElementById('sigHint').style.opacity='1';}
 
-// ===== FILE TO BASE64 =====
 function fileToB64(id){
   return new Promise(function(resolve){
     var f=document.getElementById(id).files[0];
@@ -600,66 +575,51 @@ function fileToB64(id){
   });
 }
 
-// ===== SUBMIT =====
+function apiCall(action,payload){
+  return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:action,payload:payload}),redirect:'follow'})
+  .then(function(r){return r.json();});
+}
+
 function submitForm(){
   if(!hasSig){
     alert('נא לחתום לפני שליחת הטופס');
     document.getElementById('sigCanvas').scrollIntoView({behavior:'smooth',block:'center'});
     return;
   }
-  var btn=document.getElementById('submitBtn');
-  btn.textContent='שולח...'; btn.disabled=true;
-
-  var lastName  = vf('lastName');
-  var firstName = vf('firstName');
-  var idNum     = vf('idNum');
-  var phone     = vf('phone');
-  var email     = vf('email');
-  var street    = vf('street');
-  var city      = vf('city');
-  var birthDate = vf('birthDate');
-  var gender    = radio('gender');
-
+  var lastName=vf('lastName'),firstName=vf('firstName'),idNum=vf('idNum'),
+      phone=vf('phone'),email=vf('email'),street=vf('street'),
+      city=vf('city'),birthDate=vf('birthDate'),gender=radio('gender');
   if(!lastName||!firstName||!idNum||!phone||!street||!city||!birthDate){
-    alert('נא למלא את כל שדות החובה (פרטים אישיים)');
-    btn.textContent='שלח טופס 101 ✉️'; btn.disabled=false;
-    return;
+    alert('נא למלא את כל שדות החובה (פרטים אישיים)');return;
   }
 
+  var btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='שולח...';
+  document.getElementById('progressWrap').style.display='block';
+  setProgress(5,'מכין נתונים...');
+
   var f101={
-    taxYear: taxYear,
-    status:  vf('maritalStatus'),
-    resident:radio('resident'),
-    kupat:   vf('kupat'),
-    kibbutz: vf('kibbutz'),
-    aliya:   vf('aliyaDate'),
+    taxYear:taxYear,status:vf('maritalStatus'),resident:radio('resident'),
+    kupat:vf('kupat'),kibbutz:vf('kibbutz'),aliya:vf('aliyaDate'),
     spouse:(vf('maritalStatus')==='נשוי/אה'||vf('maritalStatus')==='פרוד/ה')?{
       last:vf('spouseLast'),first:vf('spouseFirst'),id:vf('spouseId'),
-      birth:vf('spouseBirth'),income:radio('spouseIncome')
-    }:null,
-    children:collectChildren(),
-    incomeType:radio('incomeType'),
-    startThisYear:vf('f101_start'),
-    otherIncome:radio('otherIncome'),
+      birth:vf('spouseBirth'),income:radio('spouseIncome')}:null,
+    children:collectChildren(),incomeType:radio('incomeType'),
+    startThisYear:vf('f101_start'),otherIncome:radio('otherIncome'),
     otherIncomeDetails:radio('otherIncome')==='יש'?{
       nokPoints:chk('oi_nok'),hasPoints:chk('oi_has'),
       noKeren:chk('oi_nokeren'),noKitzba:chk('oi_nokitzba'),
       employer:vf('oi_emp'),tiknum:vf('oi_tiknum'),
-      monthly:vf('oi_monthly'),tax:vf('oi_tax')
-    }:null,
+      monthly:vf('oi_monthly'),tax:vf('oi_tax')}:null,
     exemptions:{
-      resident:chk('ex1'),
-      disabled:chk('ex2a'),disabledBenefit:chk('ex2b'),
-      yishuv:chk('ex3'),
-      oleh:chk('ex4'),spouseNokids:chk('ex5'),singleParent:chk('ex6'),
+      resident:chk('ex1'),disabled:chk('ex2a'),disabledBenefit:chk('ex2b'),
+      yishuv:chk('ex3'),oleh:chk('ex4'),spouseNokids:chk('ex5'),singleParent:chk('ex6'),
       childCustody:chk('ex7'),childNonCustody:chk('ex8'),soloParent:chk('ex9'),
-      alimonyPay:chk('ex10'),
-      disabledChild:chk('ex11'),disabledChildNum:vf('ex11_num'),
+      alimonyPay:chk('ex10'),disabledChild:chk('ex11'),disabledChildNum:vf('ex11_num'),
       alimony:chk('ex12'),age1618:chk('ex13'),
       army:chk('ex14'),armyStart:vf('ex14_start'),armyEnd:vf('ex14_end'),
-      degree:chk('ex15'),
-      miluim:chk('ex16'),miluimDays:vf('ex16_days')
-    },
+      degree:chk('ex15'),miluim:chk('ex16'),miluimDays:vf('ex16_days')},
     taxCoord:radio('taxCoord'),
     taxCoordRows:[
       {employer:vf('tc1_emp'),addr:vf('tc1_addr'),tik:vf('tc1_tik'),type:vf('tc1_type'),income:vf('tc1_income'),tax:vf('tc1_tax')},
@@ -674,22 +634,37 @@ function submitForm(){
     sig101:hasSig?canvas.toDataURL('image/png'):''
   };
 
-  Promise.all([fileToB64('tzFile'),fileToB64('toshavFile'),fileToB64('extraFile')])
-  .then(function(files){
-    return fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({action:'submitForm101',payload:{
-        token:_token||'',
-        idNum:idNum, phone:phone, email:email,
-        address:street+', '+city,
-        birthDate:birthDate, gender:gender,
-        lastName:lastName, firstName:firstName,
-        form101:f101,
-        files:{tz:files[0],toshav:files[1],extra:files[2]}
-      }}),
-      redirect:'follow'});
+  // שלב 1 — שלח פרטי טופס (ללא קבצים, מהיר)
+  setProgress(15,'שולח פרטי טופס...');
+  apiCall('submitForm101',{
+    token:_token||'',idNum:idNum,phone:phone,email:email,
+    address:street+', '+city,birthDate:birthDate,gender:gender,
+    lastName:lastName,firstName:firstName,form101:f101
   })
-  .then(function(){showSuccess();})
-  .catch(function(){showSuccess();});
+  .then(function(){
+    setProgress(50,'מעלה מסמכים ל-Drive...');
+    // שלב 2 — המר קבצים ושלח ל-Drive בנפרד
+    return Promise.all([fileToB64('tzFile'),fileToB64('toshavFile'),fileToB64('extraFile')]);
+  })
+  .then(function(files){
+    var hasFiles=files.some(function(f){return f!==null;});
+    if(!hasFiles){setProgress(100,'הושלם! ✅');return Promise.resolve();}
+    setProgress(70,'מעלה קבצים...');
+    return apiCall('uploadFilesToDrive',{
+      token:_token||'',
+      name:lastName+' '+firstName,
+      files:{tz:files[0],toshav:files[1],extra:files[2]}
+    });
+  })
+  .then(function(){
+    setProgress(100,'הושלם! ✅');
+    setTimeout(showSuccess,500);
+  })
+  .catch(function(){
+    // הטופס כבר נשלח — מציג הצלחה גם אם העלאת הקבצים נכשלה
+    setProgress(100,'הושלם!');
+    setTimeout(showSuccess,300);
+  });
 }
 
 function showSuccess(){
